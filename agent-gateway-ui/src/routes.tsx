@@ -36,13 +36,22 @@ import { Mcp } from './pages/Mcp';
 import { Login } from './pages/Login';
 import { K8sGateways } from './pages/K8sGateways';
 import { Plugins } from './pages/Plugins';
+import { Demo } from './pages/Demo';
+
+/** 根据 localStorage 决定首屏跳转：无凭据 → /demo；已有 → /dashboard。
+ *  这个函数由 React Router 在 index 路由渲染时同步调用，避免异步检测闪烁。 */
+function indexRoute() {
+  const hasCreds = !!window.localStorage.getItem('agent-gateway.apiKey');
+  return <Navigate to={hasCreds ? '/dashboard' : '/demo'} replace />;
+}
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppShell />,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
+      { index: true, element: indexRoute() },
+      { path: 'demo', element: <Demo /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'models', element: <ModelsList /> },
       { path: 'api-keys', element: <ApiKeysList /> },

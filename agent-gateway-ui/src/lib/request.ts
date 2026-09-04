@@ -53,17 +53,14 @@ const safeStorage: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> = (() => 
 })();
 
 /**
- * 演示 key：本地开发开箱即用（首次访问自动预填，让 Dashboard 直接有数据）。
- * 生产部署前移除（或由后端签发流程替换）。
+ * 已不再预填硬编码演示 key。空串表示未配置，调用方应在请求前引导用户：
+ *   - Demo 模式 → /demo 页一键试用（POST /v1/demo/bootstrap 写入真实 key）
+ *   - 正式环境 → /settings 页填写凭据
+ * 这样可以避免前端携带演示密钥到任何场景——之前 src/lib/request.ts 自带 sk-demo-primary-0001
+ * 兜底会让任何部署都变成"公开演示"，无法卖生产版（spec 2026-09-04 §demo-mode §8）。
  */
-const DEMO_KEY = 'sk-demo-primary-0001';
-
 export function getApiKey(): string {
-  const v = safeStorage.getItem(KEY_API_KEY);
-  if (v) return v;
-  // 未配置时预填演示 key（仅一次写入，用户可在 Settings 覆盖/清除）
-  safeStorage.setItem(KEY_API_KEY, DEMO_KEY);
-  return DEMO_KEY;
+  return safeStorage.getItem(KEY_API_KEY) ?? '';
 }
 
 export function setApiKey(v: string): void {

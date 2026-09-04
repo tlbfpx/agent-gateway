@@ -7,6 +7,7 @@ import { CommandPalette } from '../components/framework/CommandPalette';
 import { ShortcutOverlay } from '../components/framework/ShortcutOverlay';
 import { Onboarding } from '../components/framework/Onboarding';
 import { ErrorBoundary } from '../components/framework/ErrorBoundary';
+import { DemoBanner } from '../components/framework/DemoBanner';
 import { useGlobalPaletteShortcut } from '../hooks/useCommandPalette';
 import { useGlobalShortcuts } from '../hooks/useGlobalShortcuts';
 import { applyDisplayPrefsOnce } from '../hooks/useDisplayPrefs';
@@ -70,6 +71,7 @@ export function AppShell() {
             isMobile={isMobile}
             onToggleMobileMenu={() => setMobileOpen((v) => !v)}
           />
+          <DemoBanner />
           <Content className="layout-content">
             <ErrorBoundary scope="route">
               <Outlet />
