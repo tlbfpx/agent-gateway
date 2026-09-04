@@ -157,4 +157,87 @@ class AdminAuditControllerTest {
             return value != null && value.toLowerCase(Locale.ROOT).contains(kw);
         }
     }
+
+    // ============ CSV Export (spec §22.6 SOC2/ISO27001) ============
+
+    @Test
+    void exportCsvProducesValidHeaderAndRows() throws Exception {
+        org.springframework.mock.web.MockHttpServletResponse resp =
+                new org.springframework.mock.web.MockHttpServletResponse();
+        controller.exportCsv(resp, "au", null, null, null, null, null, 100);
+
+        String body = resp.getContentAsString();
+        // BOM + header
+        assertThat(body).startsWith("﻿");
+        assertThat(body.split("\n", -1)[0].replace("﻿", ""))
+                .isEqualTo("eventId,tenant,actor,actorType,type,time,resourceType,resourceId,action,result,detail");
+        // 4 fixture rows
+        long dataLines = body.lines().filter(l -> !l.isBlank()).count() - 1;
+        assertThat(dataLines).isEqualTo(4);
+    }
+
+    @Test
+    void exportCsvSetsContentDispositionAttachment() throws Exception {
+        org.springframework.mock.web.MockHttpServletResponse resp =
+                new org.springframework.mock.web.MockHttpServletResponse();
+        controller.exportCsv(resp, "au", null, null, null, null, null, 100);
+
+        assertThat(resp.getStatus()).isEqualTo(200);
+        assertThat(resp.getContentType()).startsWith("text/csv");
+        assertThat(resp.getHeader("Content-Disposition"))
+                .startsWith("attachment; filename=\"audit-au-")
+                .endsWith(".csv\"");
+    }
+
+    @Test
+    void exportCsvQuotesFieldsWithCommasAndQuotes() throws Exception {
+        // 推一条含逗号 + 双引号 的 detail 行，验证 RFC 4180 转义
+        repo.add(new AuditLog("e5", T, "alice@corp", ActorType.HUMAN, AuditEventType.GRANT_CREATE,
+                Instant.parse("2026-01-01T00:01:00Z"), "role", "r-1", "create", Result.SUCCESS,
+                "name=\"Acme, Co.\" desc=\"ok\""));
+
+        org.springframework.mock.web.MockHttpServletResponse resp =
+                new org.springframework.mock.web.MockHttpServletResponse();
+        controller.exportCsv(resp, "au", null, null, null, null, null, 100);
+
+        String body = resp.getContentAsString();
+        assertThat(body).contains("\"name=\"\"Acme, Co.\"\" desc=\"\"ok\"\"\"");
+    }
+
+    @Test
+    void exportCsvRespectsTypeFilter() throws Exception {
+        org.springframework.mock.web.MockHttpServletResponse resp =
+                new org.springframework.mock.web.MockHttpServletResponse();
+        controller.exportCsv(resp, "au", "LOGIN", null, null, null, null, 100);
+
+        String body = resp.getContentAsString();
+        // 4 fixture 行 + 表头 = 5;LOGIN 只有 1 条（e1）
+        long dataLines = body.lines().filter(l -> !l.isBlank() && !l.contains("eventId")).count();
+        assertThat(dataLines).isEqualTo(1);
+        assertThat(body).contains("e1,").contains("LOGIN,");
+        assertThat(body).doesNotContain("RBAC_DENIED");
+    }
+
+    @Test
+    void exportCsvClampsLimitToMax() throws Exception {
+        org.springframework.mock.web.MockHttpServletResponse resp =
+                org.springframework.mock.web.MockHttpServletResponse.class
+                        .getDeclaredConstructor().newInstance();
+        // 超出上限：10_000_000 应被 clamp 到 100_000（仍能跑通；4 行 fixture 都返回）
+        controller.exportCsv(resp, "au", null, null, null, null, null, 10_000_000);
+
+        String body = resp.getContentAsString();
+        long dataLines = body.lines().filter(l -> !l.isBlank() && !l.contains("eventId")).count();
+        assertThat(dataLines).isEqualTo(4);
+    }
+
+    @Test
+    void exportCsvRejectsBadFromTimestamp() {
+        org.springframework.mock.web.MockHttpServletResponse resp =
+                new org.springframework.mock.web.MockHttpServletResponse();
+        assertThatThrownBy(() ->
+                controller.exportCsv(resp, "au", null, "not-iso", null, null, null, 100))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("from");
+    }
 }
