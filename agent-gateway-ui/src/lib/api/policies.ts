@@ -116,8 +116,15 @@ async function fetchPolicies(): Promise<Policy[]> {
     if (raw.every(isPolicy)) return raw as Policy[];
     if (raw.some(asRole)) {
       // Role → Policy 视图：每个角色一条 allow 规则（资源按权限面聚合展示）
+      // Role.id 是 RoleId 值对象({value: string}),需要 unwrap 成字符串,
+      // 否则 Table rowKey 全为 [object Object] → 重复 key 警告
+      const unwrapId = (r: any, i: number): string => {
+        if (typeof r.id === 'string') return r.id;
+        if (r.id && typeof r.id.value === 'string') return r.id.value;
+        return `role-${i}`;
+      };
       return raw.filter(asRole).map((r: any, i: number) => ({
-        id: r.id ?? `role-${i}`,
+        id: unwrapId(r, i),
         name: `角色策略 · ${r.name}`,
         priority: 100 + i,
         subject: { kind: 'role' as const, value: r.name },
