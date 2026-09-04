@@ -1,5 +1,7 @@
 # Round 14 #2 报告 — bcrypt + 多 Admin 真鉴权
 
+> ⚠️ **本报告内 commit SHA 已失效**：2026-09-04 filter-branch 事故导致 19 轮 commit history 丢失。本报告表格里列出的 commit hash 不可访问，仅作历史记录参考。详见 [`docs/git-recovery-and-gitignore-lessons.md`](git-recovery-and-gitignore-lessons.md)。
+
 > 日期：2026-09-02 · 主攻：**安全补强 — 真实密码哈希 + Admin 鉴权**
 > 来源：Round 12 #1 + Round 13 报告 §九 R14+ 候选
 > 借鉴：OWASP Password Storage Cheat Sheet 2023

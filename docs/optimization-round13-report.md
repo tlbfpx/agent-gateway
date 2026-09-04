@@ -1,5 +1,7 @@
 # 优化 Round 13 报告
 
+> ⚠️ **本报告内 commit SHA 已失效**：2026-09-04 filter-branch 事故导致 19 轮 commit history 丢失。本报告表格里列出的 commit hash 不可访问，仅作历史记录参考。详见 [`docs/git-recovery-and-gitignore-lessons.md`](git-recovery-and-gitignore-lessons.md)。
+
 > 日期：2026-09-02 · 主攻：**协作 + 数据闭环终章 — 数据集 / 评测集管理**
 > 来源：竞品分析 §六 B2 + Round 10 §九 #3
 > 借鉴：Langfuse Datasets / Helicone Evals / OpenAI Evals

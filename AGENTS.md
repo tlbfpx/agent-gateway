@@ -388,7 +388,7 @@ agent-gateway/
 
 | Change | 文件夹 | 状态 |
 |---|---|---|
-| `add-foundation-skeleton` | `openspec/changes/add-foundation-skeleton/` | ✅ 已完成（阶段四归档，12 Task 双阶段评审通过） |
+| `add-foundation-skeleton` | `openspec/changes/add-foundation-skeleton/` | 🟡 已完成但 change 目录在 2026-09-04 事故中丢失，需从其他 clone 重建 |
 | `add-a2a-and-discovery` | `openspec/changes/add-a2a-and-discovery/` | ✅ 已完成（22 测试，AgentCardPort + ToolPort，bootstrap 接线） |
 | `add-session-store` | `openspec/changes/add-session-store/` | ✅ 已完成（SessionRepository 端口 + InMemory/Redis） |
 | `add-multi-model` | `openspec/changes/add-multi-model/` | ✅ 已完成（54 测试，Flow 适配+failover+多 Provider，bootstrap 接线） |

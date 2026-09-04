@@ -86,23 +86,10 @@
 
 ## 4. 维护记录（meta，2026-09-04）
 
-本节记录本文件自身及其相关分支的状态，便于后续接手者理解当前提交图。
+> **2026-09-04 事故说明**：本节原记录「`docs/known-limitations` 分支 + 4 个 commit + 推送受阻」等内容，因当日发生 `git filter-branch` 操作事故（详见 [`docs/git-recovery-and-gitignore-lessons.md`](git-recovery-and-gitignore-lessons.md)），19 轮 commit history（378 commits）全部丢失。本节引用的所有 commit SHA 与分支名均已失效，**保留此处仅为指向事故复盘文档**。
 
-### 4.1 与本文件同批的清理提交
-
-本文件创建时同步落了两个与持久化 / 工程卫生相关的提交，挂在 `docs/known-limitations` 分支上：
-
-| Commit | 内容 | 与已知限制的关系 |
-|---|---|---|
-| `a9358a2f` | `git rm -r --cached node_modules`，tracked 文件 24,760 → 2,259 | 历史遗留：`.gitignore` 漏写 `node_modules`，22,500 个第三方依赖被错误纳入版本控制。本 commit 仅解除跟踪（磁盘文件保留），不依赖 §1/§2 的功能决策 |
-| `7470aa90` | `.gitignore` 加 `node_modules/` 与 `**/node_modules/` | 配合 a9358a2f，让 `git status` 不再显示 untracked 噪音 |
-
-> **若要把本分支合并到 master**：合并后 §1/§2 内容随同生效；4.1 的两个 commit 属于工程卫生，**与功能无关，cherry-pick 顺序无关**。
-
-### 4.2 推送状态（截至 2026-09-04）
-
-- 本地分支：`docs/known-limitations`，4 commits（d486182b + a9358a2f + 7470aa90 + 文档更新）
-- 远端分支：`docs/known-limitations`，**2 commits**（`92428c75` + `588a0a1b`，通过 GitHub Contents API 紧急上传，与本地分支无共同祖先）
-- 远端 `master`：不存在（仓库初始为空）
-- 推送受阻原因：当前网络到 GitHub 数据中心（20.205.243.166）的 SSH / HTTPS 通道被中间设备劫持，TCP 握手完成后 5+ 分钟无响应；`gh api` REST 通道不受影响
-- 建议恢复方案：换网络（直连 / 热点 / 代理）后 `git push -f origin docs/known-limitations` + `git push -u origin master`
+事故后状态：
+- 远端 `master` 已重建并推送（2 commits / 1,080 files / ~2 MB）
+- 19 轮历史不可恢复；如需回查旧 commit，需从其他 clone / IDE local history / `git fsck --lost-found` 找
+- `openspec/changes/add-foundation-skeleton/` 目录在事故中丢失，`AGENTS.md` 中相应行已标记
+- 各 R 报告（Round 1-19）顶部均加 disclaimer 说明 SHA 失效
