@@ -39,3 +39,6 @@ agent-gateway-ui/.vite/
 **/.run/logs/
 *.log
 **/*.log
+
+# route-smoke 巡检产物（report.json / summary.md / *.png）
+agent-gateway-ui/test-results/
