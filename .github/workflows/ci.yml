@@ -37,6 +37,11 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-
 
+      - name: Install parent POM (defensive)
+        # Fresh CI runner 上 ~/.m2/repository 是空的, reactor build 找父 POM
+        # 失败; -N 标志只装 parent 不递归子模块, 保证 reactor 启动
+        run: mvn install -N -DskipTests -q
+
       - name: Run verify.sh
         run: bash verify.sh
 
