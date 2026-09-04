@@ -83,3 +83,9 @@ observability:
     jdbc-url: jdbc:postgresql://localhost:5433/agentgateway
     username: agentgateway
     password: agentgateway
+  # HikariPgConfig 绑定此 prefix（HikariPgProperties 字段：url/username/password/pool-size）
+  pg:
+    url: jdbc:postgresql://localhost:5433/agentgateway
+    username: agentgateway
+    password: agentgateway
+    pool-size: 20
