@@ -27,10 +27,15 @@ class A2aInvokeControllerTest {
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
-        // 等异步完成（SseEmitter 异步写）
-        mockMvc.perform(post("/a2a/nonexistent")); // no-op；用 await 方式更稳：
-        Thread.sleep(1200); // chunk 逐字 sleep(10ms)，"hello [echoed...]" ~20字符 ≈ 200ms + done
-        String body = result.getResponse().getContentAsString();
+        // 轮询等异步完成 (chunk 逐字 sleep(10ms), ~20字符 ≈ 200ms + done)
+        // 比硬 Thread.sleep(1200) 稳: 快机 200ms 就完, 慢机最多 5s 超时
+        String body = "";
+        long deadline = System.currentTimeMillis() + 5000;
+        while (System.currentTimeMillis() < deadline) {
+            body = result.getResponse().getContentAsString();
+            if (body.contains("event:done")) break;
+            Thread.sleep(50);
+        }
 
         assertThat(body).contains("event:chunk");
         assertThat(body).contains("event:done");
