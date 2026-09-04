@@ -69,6 +69,12 @@ gateway:
   # 管理端点鉴权（/v1/admin/**）：非空时要求请求头 X-Admin-Token 匹配，否则 401；空=关闭（向后兼容）
   security:
     admin-token: ${GATEWAY_ADMIN_TOKEN:}
+  # Demo 模式（spec 2026-09-04 §demo-mode）：prod 默认关闭；dev/staging 通过
+  # GATEWAY_DEMO_ENABLED=true 启用。启用后 /v1/demo/status 与 /v1/demo/bootstrap 可用。
+  demo:
+    enabled: ${GATEWAY_DEMO_ENABLED:false}
+    ttl: ${GATEWAY_DEMO_TTL:PT24H}
+    cleanup-interval: ${GATEWAY_DEMO_CLEANUP_INTERVAL:PT1H}
   # 模型列表改由管理员菜单配置（POST /v1/admin/models），持久化 data/models.json；此处不再静态声明
 # Nacos 配置中心（ModelRegistry 用裸 nacos-client；配 nacos.addr 才条件装配 infra-llm 全链路）
 # nacos:

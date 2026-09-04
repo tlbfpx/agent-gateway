@@ -1,9 +1,12 @@
 package com.company.agentgateway.bootstrap;
 
 import com.company.agentgateway.application.billing.StripeStubAdapter;
+import com.company.agentgateway.interfaces.demo.DemoConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Agent Gateway 启动入口。
@@ -15,6 +18,8 @@ import org.springframework.context.annotation.Bean;
     "com.company.agentgateway.interfaces",
     "com.company.agentgateway.infra"
 })
+@EnableConfigurationProperties(DemoConfig.class)
+@EnableScheduling
 public class GatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);

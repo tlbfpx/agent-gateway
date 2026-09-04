@@ -89,8 +89,11 @@ public class ConfigHistory {
     private void prune() throws IOException {
         List<Path> versions;
         try (var files = Files.list(historyDir)) {
-            versions = files.filter(f -> f.getFileName().toString().endsWith(".json"))
-                    .sorted().toList();
+            // 可变 list：prune 循环里需要 remove(0);Stream.toList() 返不可变 list 会抛 UnsupportedOperationException
+            versions = new java.util.ArrayList<>(files
+                    .filter(f -> f.getFileName().toString().endsWith(".json"))
+                    .sorted()
+                    .toList());
         }
         // 快照数 = maxVersions + 1（回滚前快照会占一格）；超出删最旧
         while (versions.size() > maxVersions + 1) {

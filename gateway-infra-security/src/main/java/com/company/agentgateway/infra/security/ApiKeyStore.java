@@ -24,6 +24,22 @@ public interface ApiKeyStore {
         return java.util.List.of();
     }
 
+    /**
+     * 注册一个 API Key（demo / 动态签发场景使用）。默认抛 UnsupportedOperationException，
+     * 只读实现可保持默认；JsonFileApiKeyStore 覆写以持久化到磁盘。
+     */
+    default void register(String apiKey, ApiKeyBinding binding) {
+        throw new UnsupportedOperationException("register not supported by " + getClass().getSimpleName());
+    }
+
+    /**
+     * 吊销（移除）一个 API Key。默认抛 UnsupportedOperationException；
+     * JsonFileApiKeyStore 覆写以同步删除持久化记录。
+     */
+    default void revoke(String apiKey) {
+        throw new UnsupportedOperationException("revoke not supported by " + getClass().getSimpleName());
+    }
+
     /** API Key 绑定的身份信息（认证后用于构造 AuthPrincipal）。 */
     /** tenants = 授权租户列表（含主租户 tenant；spec §6.2 二期多租户切换）。 */
     record ApiKeyBinding(TenantId tenant, UserId user,
