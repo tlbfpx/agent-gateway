@@ -1,4 +1,4 @@
-import { http } from '../request';
+import { http, getAdminToken } from '../request';
 
 /**
  * 用户反馈标注 API（Round 11 §feedback-annotation）。
@@ -81,12 +81,16 @@ export const listFeedback = (query: ListFeedbackQuery = {}) => {
   if (query.to) params.set('to', query.to);
   params.set('limit', String(query.limit ?? 50));
   params.set('offset', String(query.offset ?? 0));
-  return http.get<FeedbackRecord[]>('/feedback?' + params.toString());
+  return http.get<FeedbackRecord[]>('/feedback?' + params.toString(), {
+    headers: { 'X-Admin-Token': getAdminToken() },
+  });
 };
 
 /** 按 traceId 查全部标注。 */
 export const listFeedbackByTrace = (traceId: string) =>
-  http.get<FeedbackRecord[]>(`/feedback/by-trace/${encodeURIComponent(traceId)}`);
+  http.get<FeedbackRecord[]>(`/feedback/by-trace/${encodeURIComponent(traceId)}`, {
+    headers: { 'X-Admin-Token': getAdminToken() },
+  });
 
 /** 聚合统计。 */
 export const getFeedbackSummary = (query: { tenant?: string; model?: string; from?: string; to?: string } = {}) => {
@@ -95,5 +99,7 @@ export const getFeedbackSummary = (query: { tenant?: string; model?: string; fro
   if (query.model) params.set('model', query.model);
   if (query.from) params.set('from', query.from);
   if (query.to) params.set('to', query.to);
-  return http.get<FeedbackSummary>('/feedback/summary?' + params.toString());
+  return http.get<FeedbackSummary>('/feedback/summary?' + params.toString(), {
+    headers: { 'X-Admin-Token': getAdminToken() },
+  });
 };

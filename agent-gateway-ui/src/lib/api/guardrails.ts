@@ -18,11 +18,11 @@ export interface GuardrailStats {
 }
 
 export const guardrailsApi = {
-  currentPolicy: () => request<GuardrailPolicy>('/v1/admin/guardrails/policy'),
+  currentPolicy: () => request<GuardrailPolicy>('/admin/guardrails/policy'),
   updatePolicy: (policy: GuardrailPolicy) =>
-    request<{ status: string; mode: string }>('/v1/admin/guardrails/policy', {
+    request<{ status: string; mode: string }>('/admin/guardrails/policy', {
       method: 'POST',
       body: JSON.stringify(policy),
     }),
-  stats: () => request<GuardrailStats>('/v1/admin/guardrails/stats'),
+  stats: () => request<GuardrailStats>('/admin/guardrails/stats'),
 };
