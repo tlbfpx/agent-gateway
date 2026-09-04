@@ -21,6 +21,7 @@ const SUMMARY_FILE = path.join(OUT_DIR, 'summary.md');
 const ROUTES = [
   '/demo',
   '/signup',
+  '/status',
   '/dashboard',
   '/models',
   '/api-keys',
