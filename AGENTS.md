@@ -1,5 +1,7 @@
 # AGENTS.md — 多 Agent 协同工作规范
 
+> ⚠️ **2026-09-04 事故警示**：本仓库的 19 轮 commit history（378 commits）因 `git filter-branch` 操作事故全部丢失。重建后 master 仅有 2 个 commit；commit hash 不可访问，**不要相信任何 R 报告 / AGENTS.md 里列出的旧 SHA**。详见 [`docs/git-recovery-and-gitignore-lessons.md`](docs/git-recovery-and-gitignore-lessons.md)。
+
 > 本文件是 **agent-gateway** 项目所有协同工作的强制规范。
 > 所有步骤默认采用多个 Agent 并行/协同工作以提高效率；下方规则基于本项目实际验证过的模式（设计阶段 5 子代理并行起草 + 4 轮评审已落地，见 `docs/superpowers/specs/2026-08-12-agent-gateway-design.md` 提交历史）。
 > **人读也适用**：本文件对人类协作者同样有效。

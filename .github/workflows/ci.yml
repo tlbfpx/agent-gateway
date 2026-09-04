@@ -1,0 +1,57 @@
+# GitHub Actions CI for agent-gateway
+# 用途: 每次 push / PR 自动跑 verify.sh 门禁, 防止回归
+# 触发: master 分支 push + 任意 PR
+# 详见: docs/git-recovery-and-gitignore-lessons.md (事故后规范)
+
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  verify:
+    name: verify.sh gate
+    runs-on: macos-14  # 项目用 Mac + 后端 Java 21, 跨平台先对齐
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-
+
+      - name: Run verify.sh
+        run: bash verify.sh
+
+      - name: Check tracked file sizes
+        run: |
+          # 防止 .gitignore 漏写 (2026-09-04 教训: 870MB pack 来源就是漏 ignore)
+          # 任何 >1MB 的 tracked 文件必须有意为之
+          big_files=$(git ls-files | xargs -I{} stat -c '%s %n' {} 2>/dev/null | awk '$1 > 1048576 {print}' || true)
+          if [ -n "$big_files" ]; then
+            echo "::error::tracked files >1MB (应在 .gitignore 排除):"
+            echo "$big_files"
+            exit 1
+          fi
+
+      - name: Lint commit message format
+        run: |
+          # 项目 commit 格式: <type>(<scope>): <description> (例: feat(pg): 持久化升级)
+          # 至少要有 type + 冒号 + 描述
+          last_msg=$(git log -1 --pretty=%s)
+          if ! echo "$last_msg" | grep -qE '^(feat|fix|refactor|docs|test|chore|perf|ci|build)\([^)]+\):'; then
+            echo "::warning::commit message '$last_msg' 不符合 type(scope): description 格式"
+          fi
