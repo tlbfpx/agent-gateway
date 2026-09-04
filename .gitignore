@@ -1,0 +1,41 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.DS_Store
+HELP.md
+.mvn/wrapper/maven-wrapper.jar
+
+# Node 依赖（前后端均适用）
+node_modules/
+**/node_modules/
+
+# npm/pnpm 包管理器缓存（不应入仓）
+.npm-cache/
+**/.npm-cache/
+
+# Playwright 浏览器二进制（test 阶段下载，体积 400MB+）
+.pw-browsers/
+**/.pw-browsers/
+
+# 运行时本地数据（模型/Key 持久化与版本历史）
+data/
+**/data/models.json
+**/data/api-keys.json
+**/data/*-history/
+
+# 前端构建产物 + 类型缓存
+agent-gateway-ui/dist/
+agent-gateway-ui/tsconfig.tsbuildinfo
+agent-gateway-ui/.vite/
+.superpowers/
+
+# Git worktree 隔离开发（D 阶段起）
+.worktrees/
+
+# 运行时日志（verify.sh / 后端启动 / frontend 启动产生）
+.run/logs/
+**/.run/logs/
+*.log
+**/*.log

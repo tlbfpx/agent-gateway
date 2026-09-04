@@ -1,0 +1,8 @@
+AuthorizationServiceImplTest baseline (date: 2026-08-26 09:35 +0800)
+=============================================================
+git diff master...HEAD -- '*AuthorizationServiceImplTest*' → 0 lines
+mvn -pl gateway-infra-security test -Dtest=AuthorizationServiceImplTest → 6 tests, BUILD SUCCESS
+
+=============================================================
+Phase B end evidence (date: 2026-08-26)
+All backcompat checks PASSED (methods-present + 0-deleted-lines + 6 tests green)

@@ -1,0 +1,6 @@
+spring:
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_KEY:sk-placeholder}
+  main:
+    web-application-type: none

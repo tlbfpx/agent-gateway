@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.company.agentgateway</groupId>
+    <artifactId>agent-gateway-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>agent-gateway-parent</name>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.0</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-ai.version>2.0.0-M1</spring-ai.version>
+        <spring-ai-alibaba.version>2.0.0-M1.1</spring-ai-alibaba.version>
+    </properties>
+
+    <modules>
+        <module>gateway-domain</module>
+        <module>gateway-application</module>
+        <module>gateway-api</module>
+        <module>gateway-infra-a2a</module>
+        <module>gateway-infra-nacos</module>
+        <module>gateway-infra-llm</module>
+        <module>gateway-infra-persistence</module>
+        <module>gateway-infra-security</module>
+        <module>gateway-infra-observability</module>
+        <module>gateway-infra-cache</module>
+        <module>gateway-infra-config</module>
+        <module>gateway-replay-sdk</module>
+        <module>gateway-interfaces</module>
+        <module>gateway-bootstrap</module>
+        <module>example-agent</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 注：SAA 2.0.0-M1 会带入它依赖的 Spring AI 2.0.0-M1 版本。
+                 当后续计划真正引入 SAA starter 时，应在此 import
+                 com.alibaba.cloud.ai 的 SAA BOM（具体 GAV 在 Spike Task 2 中确认，
+                 因 2.0.0-M1 可能重命名了部分 artifact）。Spring AI BOM 此处先声明，
+                 SAA BOM 引入后以其版本为准（SAA BOM 优先）。 -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- 内部模块版本统一 -->
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-domain</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-application</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-api</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-interfaces</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-a2a</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-nacos</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-llm</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-persistence</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-security</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-observability</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-cache</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-config</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-replay-sdk</artifactId><version>${project.version}</version></dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <!-- 集成测试 profile(spec A/B/C P0):Testcontainers 启动 TimescaleDB + RabbitMQ;本地无 Docker 时 mvn verify -Pit 跳过 -->
+        <profile>
+            <id>it</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

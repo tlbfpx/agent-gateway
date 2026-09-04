@@ -1,0 +1,109 @@
+{
+  "name": "gateway-p1-features",
+  "id": "gateway-p1-features",
+  "description": "按落地顺序推进 agent-gateway 剩余功能：预算告警接线+超限降级、灰度效果对比、运营台登录态",
+  "captainSessionId": "session-cddf7503-6e89-48ed-9cb3-02f3a2e03435",
+  "createdAt": 1787900668057,
+  "members": [
+    {
+      "id": "e659c0b8-16e8-4dcf-bf85-6a5ec7b13537",
+      "name": "engineer-billing",
+      "role": "engineer",
+      "provider": "zai-coding-cn",
+      "model": "glm-5.2",
+      "joinedAt": 1787900672111,
+      "status": "removed"
+    },
+    {
+      "id": "8d989731-e214-407c-a199-ea5b41daf358",
+      "name": "engineer-metrics",
+      "role": "engineer",
+      "provider": "zai-coding-cn",
+      "model": "glm-5.2",
+      "joinedAt": 1787900672130,
+      "status": "removed"
+    },
+    {
+      "id": "a925e5c8-809f-4376-aa54-1d6842e1a501",
+      "name": "engineer-auth",
+      "role": "engineer",
+      "provider": "zai-coding-cn",
+      "model": "glm-5.2",
+      "joinedAt": 1787900672146,
+      "status": "removed"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t1",
+      "subject": "预算告警接线 + 超限降级策略",
+      "description": "仓库 /Users/muxi/workspace/agent-gateway（Java Spring 多模块 + agent-gateway-ui React）。目标：1) BudgetGuard.onUsageAccumulated（gateway-application/application/billing/BudgetGuard.java）在预算达到 80%/100% 时写入 AlertStore（domain/observability/AlertStore，已有 PgAlertStore/内存实现）并触发 Webhook 推送（infra WebhookDispatcher 已有，查 gateway-interfaces/WebhookDispatcher.java）；去重避免每笔用量重复告警。2) Budget 增加超限动作字段 overLimitAction: BLOCK（默认，现状 429）| DOWNGRADE，DOWNGRADE 时 ChatOrchestrator 在配额超限时降级到 Budget 配置的 fallbackModel 而非直接 429（仅当原模型非 fallback 时）。补单元测试，mvn -pl 相关模块 test 全绿。遵循 AGENTS.md：不并行改同一文件与其他 agent 冲突——你只改 billing/quota/orchestration 相关文件；ChatOrchestrator 若需改，只追加降级分支，不动其他逻辑。完成后报告改动文件清单与测试结果。",
+      "status": "completed",
+      "assignee": "engineer-billing",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1787900686716,
+      "updatedAt": 1787901417549,
+      "attemptId": "e8950f6a-2d4a-4e45-9a01-7e5264300efe",
+      "reassigning": false,
+      "output": "完成预算告警接线 + 超限降级策略。改动文件：\n1) gateway-domain .../domain/billing/Budget.java — 新增 OverLimitAction{BLOCK,DOWNGRADE} + fallbackModel 字段（含 DOWNGRADE 必填 fallbackModel 校验、null→BLOCK 规范化、旧签名兼容构造器）。\n2) gateway-application .../billing/BudgetGuard.java — 可选注入 AlertStore + GatewayEvents；onUsageAccumulated 在阈值(默认80%)与100%两级写入 AlertStore（dedupKey=budget:{tenant}:{pct}，firing 去重防每笔重复告警），经 GatewayEvents→WebhookEventBridge→WebhookDispatcher 推送 budget.alert 事件；失败容错不阻断。\n3) gateway-application .../billing/BudgetDowngradePolicy.java（新增）— 按租户 Budget 判定降级目标（仅 DOWNGRADE+fallbackModel 且原模型≠fallback）。\n4) gateway-application .../orchestration/ChatOrchestrator.java — 仅追加降级分支：tryAcquireTokens 超限时先查降级策略，可降级则改用 fallbackModel（仍过 checkUseModel RBAC）并发 budget.downgrade 事件；否则维持原 429。setter 注入，不动既有构造器/逻辑。\n5) 装配：OrchestrationConfig（注入 policy）、BillingQuotaAutoConfiguration（BudgetGuard 接 AlertStore/GatewayEvents + 注册 BudgetDowngradePolicy bean）。\n6) gateway-interfaces AdminBillingController — BudgetRequest 增加 overLimitAction/fallbackModel（GW-4306 校验）。\n7) PG 持久化：PgBudgetRepository 读写新列 + schema-billing-rbac.sql 幂等加列（over_limit_action/fallback_model）。\n测试：新增 ChatOrchestratorDowngradeTest(4)、BudgetGuardTest +4（两级告警/去重/webhook 推送/低于阈值）、BudgetTest +3。mvn -pl gateway-domain,gateway-application,gateway-interfaces -am test：domain 168/168、application 77/77 全绿；interfaces 99 中 2 失败均在 AdminGrayscaleComparisonControllerTest（t2 engineer-metrics 在改的灰度对比代码，与本任务无关），billing/webhook 相关 19/19 绿。"
+    },
+    {
+      "id": "t2",
+      "subject": "灰度分组效果对比报表",
+      "description": "仓库 /Users/muxi/workspace/agent-gateway。目标：模型灰度组（同名模型按 weight 分流，见 gateway-infra-llm 的模型选择/ModelDef）目前无分组效果回流视图。实现：1) 后端新增管理端点 GET /v1/admin/models/{modelId}/grayscale-comparison，按命中模型实例（灰度组内各成员）聚合近期延迟/错误率/token 成本（数据源用 MetricQueryRepository 或 BillingPort/UsageRecord，选现成最简路径，PG 不可用时内存降级）。2) 前端 agent-gateway-ui：在 pages/Models/List.tsx 或新组件加『灰度对比』入口与对比表（各成员：weight、请求数、P50/P95 延迟、错误率、成本）。不动 ChatOrchestrator/billing 文件（另一 agent 在改）。类型检查 npx tsc --noEmit 通过，涉及测试 vitest run 通过，后端 mvn test 全绿。完成后报告端点契约与改动文件。",
+      "status": "completed",
+      "assignee": "captain",
+      "dependencies": [],
+      "attempt": 2,
+      "createdAt": 1787900686735,
+      "updatedAt": 1787906669454,
+      "reassigning": false,
+      "attemptId": "94389767-75f1-4bc7-8750-e18a22f1def6",
+      "output": "灰度分组效果对比（captain 接管核验后终结）。交付：后端 AdminGrayscaleComparisonController（GET /v1/admin/models/{modelId}/grayscale-comparison，按灰度组成员聚合请求数/延迟分位/错误率/成本，内存降级）+ 测试 4/4 绿；前端 lib/api/models.ts + pages/Models/List.tsx 灰度对比入口与表格。验证：controller 测试 4/4、tsc --noEmit 通过（captain 独立复跑）。"
+    },
+    {
+      "id": "t3",
+      "subject": "运营台管理端点鉴权（X-Admin-Token）",
+      "description": "仓库 /Users/muxi/workspace/agent-gateway。目标：/v1/admin/** 端点目前无独立管理凭据。实现轻量方案：1) 新增配置 gateway.security.admin-token（默认空=关闭鉴权，向后兼容）；非空时 RbacFilter 或新 Filter 要求请求头 X-Admin-Token 匹配，否则 401（区分终端用户 X-API-Key）。2) 前端 agent-gateway-ui：lib/request.ts 支持配置 adminToken（Settings 页加输入项，localStorage），admin API 调用自动带头。3) 测试：后端 Filter 单测（有/无 token 两态）+ 前端相关测试。不动 billing/ChatOrchestrator/Models 页面主体（其他 agent 在改）；Settings.tsx 可加表单项。mvn test + npx tsc --noEmit + vitest 全绿。完成后报告改动文件。",
+      "status": "completed",
+      "assignee": "engineer-auth",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1787900686781,
+      "updatedAt": 1787901557861,
+      "attemptId": "b42a1570-d3a8-4b80-b55e-9035999e8c42",
+      "reassigning": false,
+      "output": "管理端点 X-Admin-Token 鉴权完成。后端：新增 AdminTokenFilter（@Order(15)，/v1/admin/** 且 gateway.security.admin-token 非空时校验 X-Admin-Token，常数时间比较，不匹配 401 GW-1401；空=关闭向后兼容）+ AdminTokenFilterTest 6 例全绿 + application.yml 增加 gateway.security.admin-token: ${GATEWAY_ADMIN_TOKEN:}。前端：request.ts 新增 getAdminToken/setAdminToken（localStorage，独立于 X-API-Key，clearAuth/401 不清除），/admin 路径自动附带 X-Admin-Token 头；Settings.tsx 增加 X-Admin-Token 表单项（保存/清除联动）；request.test.ts 新增 4 例。验证：tsc --noEmit 通过；vitest 30 文件 207 测试全绿；AdminTokenFilterTest+RbacFilterTest 11 例全绿。注意：gateway-interfaces 全模块 mvn test 目前剩 AdminGrayscaleComparisonControllerTest 2 例失败（engineer-metrics 的进行中文件，非本任务改动）。"
+    },
+    {
+      "id": "t4",
+      "subject": "openspec 变更记录：预算告警+超限降级",
+      "description": "仓库 /Users/muxi/workspace/agent-gateway。按 openspec/changes/ 现有四件套格式（先读一个已有 change 的结构再仿写），为已完成的『预算告警接线 + 超限降级』创建变更记录：概述 BudgetGuard 两级告警（AlertStore+Webhook dedupKey 去重）、Budget.overLimitAction BLOCK|DOWNGRADE + fallbackModel、ChatOrchestrator 降级分支、PG schema 幂等加列、涉及 API（POST/PUT budget 的 overLimitAction/fallbackModel 字段）。只新增 openspec/changes/<新目录>/ 下文件，不改任何代码。完成后报告路径。",
+      "status": "completed",
+      "assignee": "engineer-billing",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1787901708134,
+      "updatedAt": 1787901821195,
+      "attemptId": "ad91cb76-5155-4021-a17b-014f11723e15",
+      "reassigning": false,
+      "output": "已创建 openspec 变更记录（仅新增文件，未改任何代码）：openspec/changes/2026-08-28-budget-alert-and-downgrade/ 下 proposal.md + design.md + tasks.md，格式仿照 archive/2026-08-27-d2-quota-and-billing。内容涵盖：BudgetGuard 80%/100% 两级告警（AlertStore + Webhook，dedupKey budget:{tenant}:{pct} 去重）、Budget.overLimitAction BLOCK|DOWNGRADE + fallbackModel（含默认值/校验/旧构造器兼容）、BudgetDowngradePolicy + ChatOrchestrator 降级分支（RBAC 仍校验）、PG schema 幂等加列、POST/PUT /v1/admin/billing/budgets 的 overLimitAction/fallbackModel 字段（GW-4306 校验）及测试验证结果（domain 168/168、application 77/77 全绿）。"
+    },
+    {
+      "id": "t5",
+      "subject": "openspec 变更记录：X-Admin-Token 鉴权",
+      "description": "仓库 /Users/muxi/workspace/agent-gateway。按 openspec/changes/ 现有四件套格式（先读一个已有 change 的结构再仿写），为已完成的『管理端 X-Admin-Token 鉴权』创建变更记录：gateway.security.admin-token 配置（空=关闭向后兼容）、AdminTokenFilter 常数时间比较、前端 request.ts/Settings 支持、与 X-API-Key 的关系。只新增 openspec/changes/<另一新目录>/ 下文件，不改任何代码、不与队友的 openspec 目录冲突。完成后报告路径。",
+      "status": "completed",
+      "assignee": "engineer-auth",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1787901708661,
+      "updatedAt": 1787901772629,
+      "attemptId": "7fa862ae-166a-48e2-b8aa-fe8fd2a53248",
+      "reassigning": false,
+      "output": "openspec 变更记录已创建：openspec/changes/2026-08-28-add-admin-token-auth/ 下四件套 proposal.md / design.md / spec.md / tasks.md，格式仿照 archive/2026-08-27-add-pg-persistence。内容覆盖：gateway.security.admin-token 配置（空=关闭向后兼容）、AdminTokenFilter 常数时间比较（@Order(15) 先于 RbacFilter）、前端 request.ts/Settings 支持、X-Admin-Token 与 X-API-Key 的独立关系（adminToken 不随 401/clearAuth 清除）、5 条可测试条款 GW-ADMINTOKEN-001~005。未改任何代码，未与队友 openspec 目录冲突（全仓库仅有 archive/ 下已有目录）。验证：文件已写入且路径唯一。"
+    }
+  ],
+  "taskSeq": 5
+}

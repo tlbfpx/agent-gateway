@@ -1,0 +1,85 @@
+spring:
+  application:
+    name: agent-gateway
+  main:
+    banner-mode: off
+  autoconfigure:
+    exclude:
+      # SAA DashScopeMultimodalEmbedding：2.0.0-M1.1 打包缺陷（类在 jar 内不存在，见 spike 报告），必须排除
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeMultimodalEmbeddingAutoConfiguration
+      # 可观测性存储(spec 2026-08-19 §5.2)用自建 DriverManagerDataSource(条件装配),
+      # 排除 Boot 自动 Hikari —— 无 spring.datasource.url 时它会导致启动失败
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+  # Flyway schema migrations（Round 15 #2 + R17 #2 baseline 初始化）
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+    table: flyway_schema_history
+    fail-on-missing-locations: true
+  ai:
+    # 各 provider starter 的 autoconfig（chat/embedding/image 等）在无 API key 时 fail-fast 启动失败。
+    # 本网关不使用这些自动装配的 bean——ChatClientFactory 按 ModelDef(apiKeyRef ${SECRET:...}) 在调用时手动构造 ChatModel，
+    # 真实 key 由 ModelDef 注入。这里给每个 provider 一个占位 key，满足其 presence 检查（key 不被校验直到真实 API 调用）。
+    # 部署时用真实 key 覆盖对应环境变量。
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY:sk-placeholder}
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:sk-placeholder}
+    openai:
+      api-key: ${OPENAI_API_KEY:sk-placeholder}
+    zhipuai:
+      api-key: ${ZHIPU_API_KEY:sk-placeholder}
+    minimax:
+      api-key: ${MINIMAX_API_KEY:sk-placeholder}
+server:
+  port: 8080
+  shutdown: graceful          # 优雅停机：等流式连接结束
+spring.lifecycle.timeout-per-shutdown-phase: 30s
+# 暴露 metrics 端点(spec 2026-08-19 §5.2):MeterRegistry bean 由 actuator 提供,
+# PgMetricsPublisher 的 delta 快照与 MicrometerObservabilityHooks 都依赖它
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+# 多模型接入（infra-llm）：fallbackToolModel 必配（能力降级用，缺 FC 时 failover 到此模型）
+gateway:
+  dev: true
+  llm:
+    fallback-tool-model: ${FALLBACK_TOOL_MODEL:}
+    default-model: ${DEFAULT_MODEL:minimax-abab6.5s-chat}
+    # 提示缓存（Prompt Cache，语义缓存第一步：规范化精确匹配，对标 LiteLLM/Portkey）
+    # enabled 默认关闭；命中条件（保守）：无工具调用 + 会话首轮（无多轮 history）
+    # key=SHA-256(模型ID+规范化prompt+temperature)；ttl 缓存有效期；max-entries 容量上限（超出按插入序淘汰）
+    prompt-cache:
+      enabled: ${PROMPT_CACHE_ENABLED:false}
+      ttl: ${PROMPT_CACHE_TTL:10m}
+      max-entries: ${PROMPT_CACHE_MAX_ENTRIES:1000}
+  # 持久化 API Key（重启不丢；动态签发的 key 仅内存，生产用 DB/Redis store）
+  api-keys:
+    - key: ${GATEWAY_DEMO_KEY:sk-fixed-demo-001}
+      tenant: t1
+      user: demo
+      agentGrants:
+        - echo-agent
+      allowedModels:
+        - minimax-abab6.5s-chat
+  # 管理端点鉴权（/v1/admin/**）：非空时要求请求头 X-Admin-Token 匹配，否则 401；空=关闭（向后兼容）
+  security:
+    admin-token: ${GATEWAY_ADMIN_TOKEN:}
+  # 模型列表改由管理员菜单配置（POST /v1/admin/models），持久化 data/models.json；此处不再静态声明
+# Nacos 配置中心（ModelRegistry 用裸 nacos-client；配 nacos.addr 才条件装配 infra-llm 全链路）
+# nacos:
+#   addr: 127.0.0.1:8848
+
+# 持久化存储（add-pg-persistence）：一套 PG 承载 可观测性 + 计费/配额/预算 + RBAC
+# docker-compose.observability.yml 提供 TimescaleDB（宿主机 5433）
+# 未配置本节时全部自动降级 InMemory（开发/测试零成本）
+observability:
+  storage:
+    enabled: true
+    jdbc-url: jdbc:postgresql://localhost:5433/agentgateway
+    username: agentgateway
+    password: agentgateway

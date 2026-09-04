@@ -1,0 +1,25 @@
+# 可观测性存储(spec 2026-08-19 §9):PostgreSQL + TimescaleDB
+# 用法:docker compose -f docker-compose.observability.yml up -d
+# 网关侧配置(bootstrap application.yml):
+#   observability.storage.enabled=true
+#   observability.storage.jdbc-url=jdbc:postgresql://localhost:5432/agentgateway
+services:
+  observability-db:
+    image: timescale/timescaledb:latest-pg16
+    container_name: agentgateway-observability-db
+    environment:
+      POSTGRES_USER: agentgateway
+      POSTGRES_PASSWORD: agentgateway
+      POSTGRES_DB: agentgateway
+    ports:
+      - "5433:5432"   # 宿主机 5433,避免与本地既有 PG 冲突
+    volumes:
+      - observability-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentgateway -d agentgateway"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  observability-pgdata:

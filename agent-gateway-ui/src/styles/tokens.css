@@ -1,0 +1,130 @@
+/* === Design Tokens — Industrial Rationalism === */
+:root {
+  /* Brand */
+  --brand-deep: #0F1B3D;
+  --brand-amber: #D4A574;
+  --brand-amber-soft: rgba(212, 165, 116, .12);
+
+  /* Ant Design aligned */
+  --ant-primary: #1677ff;
+  --ant-primary-hover: #4096ff;
+  --ant-success: #52c41a;
+  --ant-warning: #faad14;
+  --ant-error: #ff4d4f;
+
+  /* Surface */
+  --bg-canvas: #F5F7FB;
+  --bg-surface: #FFFFFF;
+  --bg-sunken: #FAFBFD;
+  --bg-hover: #F2F5FA;
+
+  /* Border */
+  --border-thin: #EEF0F5;
+  --border-default: #E5E8EF;
+  --border-strong: #D9DDE6;
+
+  /* Text */
+  --text-1: #1A2237;
+  --text-2: #4E5870;
+  --text-3: #8A93A8;
+  --text-4: #B4BBCB;
+
+  /* Typography */
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Cormorant Garamond", "Noto Sans SC", serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+
+  /* Spacing (default = comfortable) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
+  --content-pad-y: 20px;
+  --content-pad-x: 16px;
+  --row-gap: 16px;
+
+  /* Radius */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+  --r-xl: 14px;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --sidebar-w-collapsed: 64px;
+  --header-h: 56px;
+
+  /* Ant overrides via data attribute */
+  color-scheme: light;
+}
+
+/* === Dark Theme === */
+[data-theme="dark"] {
+  --brand-deep: #0B1428;
+  --brand-amber: #E0B68A;
+  --brand-amber-soft: rgba(224, 182, 138, .15);
+
+  --bg-canvas: #0E1422;
+  --bg-surface: #161E33;
+  --bg-sunken: #0F1828;
+  --bg-hover: #1E2740;
+
+  --border-thin: #1E2740;
+  --border-default: #2A3354;
+  --border-strong: #3A4569;
+
+  --text-1: #E8ECF7;
+  --text-2: #B4BBCB;
+  --text-3: #8A93A8;
+  --text-4: #5A6584;
+
+  color-scheme: dark;
+}
+
+/* === Density: compact === */
+[data-density="compact"] {
+  --s-1: 2px; --s-2: 4px; --s-3: 8px; --s-4: 12px;
+  --s-5: 14px; --s-6: 16px; --s-7: 20px; --s-8: 24px;
+  --content-pad-y: 12px;
+  --content-pad-x: 12px;
+  --row-gap: 8px;
+  --header-h: 48px;
+  --sidebar-w: 200px;
+  --sidebar-w-collapsed: 56px;
+}
+
+/* === Density: loose === */
+[data-density="loose"] {
+  --s-1: 6px; --s-2: 12px; --s-3: 16px; --s-4: 24px;
+  --s-5: 28px; --s-6: 32px; --s-7: 40px; --s-8: 48px;
+  --content-pad-y: 28px;
+  --content-pad-x: 24px;
+  --row-gap: 24px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-1);
+  background: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection { background: var(--brand-amber-soft); color: var(--text-1); }
+
+/* Subtle scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
+
+/* Number columns: tabular-nums */
+.num {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum';
+}
+.mono { font-family: var(--font-mono); }

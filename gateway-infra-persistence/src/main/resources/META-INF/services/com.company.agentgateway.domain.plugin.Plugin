@@ -1,0 +1,4 @@
+com.company.agentgateway.application.plugin.builtin.HeaderInjectPlugin
+com.company.agentgateway.application.plugin.builtin.CompressPlugin
+com.company.agentgateway.application.plugin.builtin.AuditPlugin
+com.company.agentgateway.application.plugin.builtin.RateLimitPlugin

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.company.agentgateway</groupId>
+        <artifactId>agent-gateway-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>gateway-interfaces</artifactId>
+    <name>gateway-interfaces</name>
+    <description>Web 接口层：/v1/chat/stream SSE 端点 + 认证 filter + 异常处理</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.company.agentgateway</groupId>
+            <artifactId>gateway-application</artifactId>
+        </dependency>
+        <!-- infra-observability: ChatController 埋点 GatewayTracer(spec 2026-08-19 §5.1) -->
+        <dependency>
+            <groupId>com.company.agentgateway</groupId>
+            <artifactId>gateway-infra-observability</artifactId>
+        </dependency>
+        <!-- infra-security: admin 控制器直接操作 ApiKeyStore -->
+        <dependency>
+            <groupId>com.company.agentgateway</groupId>
+            <artifactId>gateway-infra-security</artifactId>
+        </dependency>
+        <!-- infra-llm: AdminModelController 直接操作 ModelRegistry -->
+        <dependency>
+            <groupId>com.company.agentgateway</groupId>
+            <artifactId>gateway-infra-llm</artifactId>
+        </dependency>
+        <!-- infra-config: JsonFileWebhookStore / JsonFileRoleStore 持久化(Sprint 1 P0) -->
+        <dependency>
+            <groupId>com.company.agentgateway</groupId>
+            <artifactId>gateway-infra-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Reactor（Flux 订阅桥接到 SseEmitter） -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+
+        <!-- Round 9 运营体验:Apache POI 生成 XLSX(导出 Audit/Billing/Trace);Parquet 留 P3 后续 -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- WebMvcTest（Boot 4.0 需显式声明 test-autoconfigure） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals><goal>check</goal></goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/company/agentgateway/interfaces/**</exclude>
+                            </excludes>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

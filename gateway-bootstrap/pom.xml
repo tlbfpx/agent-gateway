@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.company.agentgateway</groupId>
+        <artifactId>agent-gateway-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>gateway-bootstrap</artifactId>
+    <dependencies>
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-interfaces</artifactId></dependency>
+        <!-- infra-llm: 多模型接入（ChatClientPort/ModelRegistry/Factory）。含 dashscope starter，需 application.yml exclude -->
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-llm</artifactId></dependency>
+        <!-- infra-nacos + infra-a2a: AgentCardPort（AgentCard 发现）+ ToolPort（A2A 调用）。条件装配（nacos.addr） -->
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-nacos</artifactId></dependency>
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-a2a</artifactId></dependency>
+        <!-- infra-persistence: SessionRepository（会话存储，InMemory 默认 + Redis 条件装配） -->
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-persistence</artifactId></dependency>
+        <!-- infra-security: API Key 认证 + Agent/模型级 RBAC -->
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-security</artifactId></dependency>
+        <!-- infra-observability: Micrometer 指标（ObservabilityHooks）+ actuator 端点 -->
+        <dependency><groupId>com.company.agentgateway</groupId><artifactId>gateway-infra-observability</artifactId></dependency>
+        <!-- actuator: 暴露 /actuator/metrics -->
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

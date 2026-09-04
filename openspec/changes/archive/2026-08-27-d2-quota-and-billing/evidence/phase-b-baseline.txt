@@ -1,0 +1,4 @@
+AuthorizationServiceImplTest baseline (date: 2026-08-26 D2)
+=============================================================
+git diff master...HEAD -- *AuthorizationServiceImplTest* → 0 lines
+mvn -pl gateway-infra-security test -Dtest=AuthorizationServiceImplTest → 12 tests (D1 既有 6 + D1 新增 6), BUILD SUCCESS

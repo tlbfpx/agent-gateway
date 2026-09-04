@@ -1,0 +1,3 @@
+com.company.agentgateway.application.config.OrchestrationConfig
+com.company.agentgateway.application.config.DevStubAutoConfiguration
+com.company.agentgateway.application.config.BillingQuotaAutoConfiguration

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: example-agent
+  main:
+    banner-mode: off
+server:
+  port: 8090
+# 示例 Agent 名（Nacos 注册用）
+example:
+  agent:
+    name: echo-agent
+# Nacos 注册（可选：有 nacos.addr 时注册，无则仅本地可调）
+# nacos:
+#   addr: 127.0.0.1:8848
