@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 echo "=== [1/3] 全量编译 ==="
-mvn -q clean install -DskipTests -Djacoco.skip=true
+mvn clean install -DskipTests -Djacoco.skip=true
 echo "✓ 编译通过"
 echo "=== [2/3] 全量测试 ==="
 fail=0
