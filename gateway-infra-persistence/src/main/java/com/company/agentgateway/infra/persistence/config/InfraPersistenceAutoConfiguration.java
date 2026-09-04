@@ -180,11 +180,8 @@ public class InfraPersistenceAutoConfiguration {
         return ds;
     }
 
-    @Bean
-    @ConditionalOnProperty(name = "observability.storage.enabled", havingValue = "true")
-    public JdbcTemplate observabilityJdbcTemplate(DataSource observabilityDataSource) {
-        return new JdbcTemplate(observabilityDataSource);
-    }
+    // observabilityJdbcTemplate 由 HikariPgConfig 提供 (R16 #4 HikariCP 实现),
+    // 本类不再重复定义, 避免 bean override 冲突.
 
     /** ObjectMapper 兜底:json 序列化仅用于 jsonb 列,无需 Boot 定制版。 */
     @Bean
@@ -221,6 +218,7 @@ public class InfraPersistenceAutoConfiguration {
 
     /** WorkflowRepository(C1 §3.4 P1):PG 模式下用 PgWorkflowRepository,否则降级 InMemory。 */
     @Bean
+    @ConditionalOnMissingBean(WorkflowRepository.class)
     @ConditionalOnProperty(name = "observability.storage.enabled", havingValue = "true")
     @org.springframework.context.annotation.Primary
     public WorkflowRepository pgWorkflowRepository(JdbcTemplate observabilityJdbcTemplate, ObjectMapper objectMapper) {
@@ -229,6 +227,7 @@ public class InfraPersistenceAutoConfiguration {
 
     /** WorkflowDefinitionRepository(C1 §8 扩展):PG 模式下用 PgWorkflowDefinitionRepository。 */
     @Bean
+    @ConditionalOnMissingBean(WorkflowDefinitionRepository.class)
     @ConditionalOnProperty(name = "observability.storage.enabled", havingValue = "true")
     @org.springframework.context.annotation.Primary
     public WorkflowDefinitionRepository pgWorkflowDefinitionRepository(JdbcTemplate observabilityJdbcTemplate) {
@@ -331,6 +330,7 @@ public class InfraPersistenceAutoConfiguration {
      * 需 Spring JdbcTemplate(由本类的 observabilityJdbcTemplate 提供)。
      */
     @Bean
+    @ConditionalOnMissingBean(com.company.agentgateway.domain.iam.admin.AdminUserRepository.class)
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
             name = "observability.storage.enabled", havingValue = "true")
     public com.company.agentgateway.domain.iam.admin.AdminUserRepository pgAdminUserRepository(
@@ -339,6 +339,7 @@ public class InfraPersistenceAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(com.company.agentgateway.domain.feedback.FeedbackRepository.class)
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
             name = "observability.storage.enabled", havingValue = "true")
     public com.company.agentgateway.domain.feedback.FeedbackRepository pgFeedbackRepository(
@@ -398,6 +399,7 @@ public class InfraPersistenceAutoConfiguration {
      * 会自动让位，所以本 bean 是「开 Pg 即用 Pg」开关式装配。
      */
     @Bean
+    @org.springframework.context.annotation.Primary
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
             name = "observability.storage.enabled", havingValue = "true")
     public com.company.agentgateway.domain.mcp.McpPort pgMcpServerRepository(
