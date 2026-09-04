@@ -8,10 +8,11 @@ import {
    CopyOutlined,
    SearchOutlined,
    FilterOutlined,
+   DownloadOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
 import { EmptyState } from '../components/framework/EmptyState';
-import { listAuditLogs } from '../lib/api/audit';
+import { listAuditLogs, downloadAuditCsv } from '../lib/api/audit';
 import type { AuditEntry } from '../lib/api/audit';
 import { getTenant } from '../lib/request';
 import { ErrorState } from '../components/framework/EmptyState';
@@ -146,6 +147,20 @@ export function Audit() {
               onChange={(e) => setKeyword(e.target.value)}
             />
             <Button icon={<ReloadOutlined />} onClick={reload}>刷新</Button>
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={async () => {
+                try {
+                  await downloadAuditCsv({ tenant, type, result, from: rangeToFrom(range), keyword: keyword || undefined, limit: 10000 });
+                  message.success('导出已开始');
+                } catch (e) {
+                  message.error(e instanceof Error ? e.message : '导出失败');
+                }
+              }}
+              data-testid="audit-export-btn"
+            >
+              导出 CSV
+            </Button>
           </Space>
         }
       />
