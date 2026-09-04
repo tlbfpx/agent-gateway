@@ -1,15 +1,15 @@
 # 已知限制（Known Limitations）
 
-> 最后更新：2026-09-04 · 维护约定：每轮优化若引入或消除限制，同步更新本文件
+> 最后更新：2026-09-04（R20 #1 补齐 McpPort → Pg）· 维护约定：每轮优化若引入或消除限制，同步更新本文件
 >
 > 本文件记录**已明确决定不做 / 暂缓**的能力缺口，避免后续接手时把「演示可用」误判成「生产就绪」。
 > 与各轮报告 §已知限制 的区别：报告里的是「留给下一轮」，这里的是「已决定放弃或长期搁置」。
 
 ---
 
-## 1. Dataset / K8sGateway / Mcp 三处仍为内存态存储
+## 1. Dataset / K8sGateway 两处仍为内存态存储
 
-**状态**：已放弃原 Round 16 #2 计划（该任务于 2026-09-03 删除），无后续排期。
+**状态**：原 Round 16 #2 计划已放弃（任务于 2026-09-03 删除）。R20 #1（2026-09-04）补齐 McpPort → Pg。
 
 **影响面**
 
@@ -17,24 +17,28 @@
 |---|---|---|---|
 | 评测数据集 / case / run | `InMemoryDatasetRepositories`（`gateway-infra-persistence/.../dataset/`） | ❌ | 数据集、用例、评测历史全部丢失 |
 | `K8sGatewayPort` | `InMemoryK8sGatewayStore`（`.../k8s/`） | ❌ | 已注册的网关路由配置丢失 |
-| `McpPort` | `InMemoryMcpServerRepository`（`.../mcp/`） | ❌ | MCP Server 注册表丢失（内置种子数据会重建） |
+| `McpPort` | `PgMcpServerRepository`（Pg，`observability.storage.enabled=true` 启用）/ `InMemoryMcpServerRepository`（默认） | ✅ / ❌ | **重启不丢**（Pg 模式）/ 丢失（InMemory 模式，内置 2 个示例 server 重建） |
 
 **因此**
 
-- 这三块功能定位为**单实例演示 / 开发自测**，不具备多副本部署能力（各副本内存互不可见）。
+- 这两块功能定位为**单实例演示 / 开发自测**，不具备多副本部署能力（各副本内存互不可见）。
 - 评测报表不可作为长期质量基线——重启即归零，无法做跨版本趋势对比。
-- 前端 `/datasets`、K8s、MCP 相关页面在生产环境会表现为「数据莫名消失」，属预期行为而非 bug。
+- 前端 `/datasets`、K8s 相关页面在生产环境会表现为「数据莫名消失」，属预期行为而非 bug。
+- **MCP 服务注册表**（R20 #1 后）已在 Pg 模式下重启不丢，多副本可同步。
 
-**若将来要补 Pg，注意两个额外工作量（不是加个 PgXxxRepository 就完事）**
+**若将来要补 Pg（Dataset / K8s），注意两个额外工作量**
 
 1. **Dataset 缺端口抽象**：`gateway-domain/.../dataset/` 下只有实体（`EvalDataset` / `EvalCase` / `EvalRun`）和 `Judge`，**没有 Repository 接口**。
    `DatasetService`、`EvalRunService` 直接依赖具体类 `InMemoryDatasetRepositories`，
    所以切 Pg 需先抽端口接口 + 改应用层构造签名，属破坏性重构。
-   对比：K8s/Mcp 已有 `K8sGatewayPort` / `McpPort` 端口，替换成本低得多。
-2. **Bean 装配是 `@ConditionalOnMissingBean(具体类)`**（见 `DatasetAutoConfiguration` / `K8sAutoConfiguration` / `McpAutoConfiguration`），
+   对比：K8s 已有 `K8sGatewayPort`，替换成本中等。
+2. **Bean 装配是 `@ConditionalOnMissingBean(具体类)`**（见 `DatasetAutoConfiguration` / `K8sAutoConfiguration`），
    新增 Pg 实现**不会**自动顶掉 InMemory bean，需要同步改自动配置类的条件。
+   （R20 #1 Mcp 的修法可参考：`@ConditionalOnProperty` + `InMemory` 仍标 `@ConditionalOnMissingBean(McpPort.class)` 让位。）
 
-**已落 Pg 的对照**（8 个规划中的 Repo 覆盖 5 个，62%）：Feedback、AdminUser、Team、PromptTemplate、PromptVersion ✅
+**Pg 覆盖进度**（8 个规划 Repo + R20 新增 1 个 = 6/9，67%）：
+- ✅ Feedback / AdminUser / Team / PromptTemplate / PromptVersion / **McpServer (R20 #1)**
+- ❌ Dataset / K8sGateway
 
 ---
 

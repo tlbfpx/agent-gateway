@@ -389,4 +389,19 @@ public class InfraPersistenceAutoConfiguration {
         }
         return found.toArray(new com.company.agentgateway.domain.plugin.Plugin[0]);
     }
+
+    // ================= R20 #1 MCP 服务注册 Pg 持久化 =================
+
+    /**
+     * PgMcpServerRepository —— {@code observability.storage.enabled=true} 启用。
+     * McpAutoConfiguration 的 InMemory bean {@code @ConditionalOnMissingBean(McpPort.class)}
+     * 会自动让位，所以本 bean 是「开 Pg 即用 Pg」开关式装配。
+     */
+    @Bean
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
+            name = "observability.storage.enabled", havingValue = "true")
+    public com.company.agentgateway.domain.mcp.McpPort pgMcpServerRepository(
+            JdbcTemplate observabilityJdbcTemplate) {
+        return new com.company.agentgateway.infra.persistence.mcp.PgMcpServerRepository(observabilityJdbcTemplate);
+    }
 }
