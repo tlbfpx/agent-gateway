@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, Button, Space, message, Alert, Select, Tag } from 'antd';
+import { Form, Input, Button, Space, message, Alert, Select, Tag, Card } from 'antd';
+import { ThunderboltOutlined } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
 import { getApiKey, setApiKey, getTenant, setTenant, getAdminToken, setAdminToken } from '../lib/request';
 import { RestartOnboardingButton } from '../components/framework/Onboarding';
@@ -7,12 +8,20 @@ import { DisplaySwitcher } from '../components/framework/DisplaySwitcher';
 import { useRole, setRole, listRoles, ROLE_LABEL, ROLE_COLOR } from '../hooks/useRole';
 import { getPromptCacheConfig } from '../lib/api/promptCache';
 import type { PromptCacheConfig } from '../lib/api/promptCache';
+import { createApiKey } from '../lib/api/keys';
 
 export function Settings() {
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
+  const [creatingKey, setCreatingKey] = useState(false);
+  const [issuedKey, setIssuedKey] = useState<string>('');
   const role = useRole();
   const [promptCache, setPromptCache] = useState<PromptCacheConfig | null>(null);
+  const [hasApiKey, setHasApiKey] = useState<boolean>(!!getApiKey());
+  const [hasAdminToken, setHasAdminToken] = useState<boolean>(!!getAdminToken());
+
+  // 检测「已登录但无 API Key」：自助注册后常见，挡在这里体验最差
+  const needsFirstKey = hasAdminToken && !hasApiKey;
 
   // 提示缓存配置：只读尝试 GET /admin/config/gateway.llm.prompt-cache；
   // 后端暂未提供该读写 API 时保持 null（卡片降级为占位说明，不硬造写入接口）
@@ -46,8 +55,35 @@ export function Settings() {
     setApiKey('');
     setTenant('primary');
     setAdminToken('');
+    setHasApiKey(false);
+    setHasAdminToken(false);
+    setIssuedKey('');
     form.resetFields();
     message.success('已清除');
+  };
+
+  /** 自助注册后第一把 API Key 一键签发（spec §self-send-onboarding §4）。
+   *  后端 POST /v1/admin/api-keys 仅要求请求体带 tenant + user，不要求 apiKey 自身。
+   *  user 用当前 adminToken 对应账号的 email（如果可推导）或 fallback 'owner'。 */
+  const onCreateFirstKey = async () => {
+    const tenant = getTenant();
+    setCreatingKey(true);
+    try {
+      const r = await createApiKey({ tenant, user: 'owner' });
+      const key = r.created?.value ?? (r as any).apiKey?.value ?? '';
+      if (!key) {
+        throw new Error('后端未返回 key value');
+      }
+      setApiKey(key);
+      setIssuedKey(key);
+      setHasApiKey(true);
+      form.setFieldValue('apiKey', key);
+      message.success('已签发首把 API Key');
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : '签发失败');
+    } finally {
+      setCreatingKey(false);
+    }
   };
 
   return (
@@ -64,6 +100,60 @@ export function Settings() {
         style={{ marginBottom: 16 }}
         message="修改后将立即作用于全部后续请求，401 会自动清空。"
       />
+
+      {needsFirstKey && (
+        <Card
+          data-testid="first-key-cta"
+          style={{
+            maxWidth: 640,
+            marginBottom: 16,
+            background: 'linear-gradient(135deg, #f0f5ff 0%, #fff7e6 100%)',
+            borderColor: '#faad14',
+          }}
+        >
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space>
+              <ThunderboltOutlined style={{ color: '#faad14', fontSize: 20 }} />
+              <strong style={{ fontSize: 16 }}>欢迎 · 一键签发你的第一把 API Key</strong>
+            </Space>
+            <div style={{ color: 'var(--text-2)', fontSize: 13, lineHeight: 1.7 }}>
+              已检测到 Admin Token 但还没有 API Key。整个产品功能都依赖 Key 才能调用
+              （chat、feedback、metrics、cache …）。点击下方按钮 5 秒拿到 Key，之后所有页面
+              自动可用。
+            </div>
+            <Space wrap>
+              <Button
+                type="primary"
+                size="large"
+                icon={<ThunderboltOutlined />}
+                loading={creatingKey}
+                onClick={onCreateFirstKey}
+                data-testid="first-key-btn"
+              >
+                {creatingKey ? '签发中…' : '一键签发首把 API Key'}
+              </Button>
+              <Button onClick={() => setHasApiKey(!!getApiKey())}>我已有 Key · 刷新状态</Button>
+            </Space>
+            {issuedKey && (
+              <Alert
+                type="success"
+                showIcon
+                message="Key 已签发并自动写入本地"
+                description={
+                  <Space direction="vertical" size={4}>
+                    <code style={{ wordBreak: 'break-all' }}>
+                      {issuedKey.slice(0, 16)}…{issuedKey.slice(-6)}
+                    </code>
+                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>
+                      完整值已写入 localStorage.agent-gateway.apiKey · 下次启动自动带入
+                    </span>
+                  </Space>
+                }
+              />
+            )}
+          </Space>
+        </Card>
+      )}
 
       <div className="content-card" style={{ maxWidth: 640 }}>
         <Form

@@ -97,8 +97,8 @@ export function ApiKeysList() {
       const v = await form.validateFields();
       setIssuing(true);
       const result = await createApiKey({
-        owner: v.owner ?? 'admin',
         tenant: v.tenant,
+        user: v.owner ?? 'admin',
         // 多选 Select 本身返回 string[]，直接透传（旧代码误包了一层数组）
         models: v.models?.length ? v.models : undefined,
         rateLimitRpm: v.rateLimitRpm ? Number(v.rateLimitRpm) : undefined,

@@ -44,7 +44,15 @@ export interface TopUpResult {
 }
 
 export const listApiKeys = () => http.get<ApiKey[]>('/admin/api-keys');
-export const createApiKey = (body: Partial<ApiKey> & { apiKey?: string }) =>
+export const createApiKey = (body: Partial<ApiKey> & {
+  apiKey?: string;
+  /** 后端 CreateApiKeyRequest 必填字段 */
+  tenant: string;
+  user: string;
+  agentGrants?: string[];
+  allowedModels?: string[];
+  expiresAt?: string;
+}) =>
   http.post<{ apiKey: ApiKey & { value: string }; created: ApiKey & { value: string } }>(
     '/admin/api-keys',
     body,
