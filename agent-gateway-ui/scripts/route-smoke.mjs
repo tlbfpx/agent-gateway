@@ -212,7 +212,7 @@ async function main() {
 
     if (status !== 'nav-error') {
       try {
-        await page.locator('main').first().waitFor({ timeout: 10_000 });
+        await page.locator('main').first().waitFor({ timeout: 25_000 });
         mainVisible = true;
       } catch {
         mainVisible = false;
