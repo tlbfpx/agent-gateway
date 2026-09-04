@@ -86,7 +86,8 @@ export function Demo() {
             </ul>
             <Paragraph type="secondary" style={{ margin: 0 }}>
               <Tag color="orange">注意</Tag>
-              Demo 数据 24 小时后自动清理；正式使用请通过设置页绑定你的真实账号。
+              Demo 数据 24 小时后自动清理；正式使用请
+              <a href="/signup">自助注册</a>。
             </Paragraph>
             <Button
               type="primary"
@@ -121,8 +122,8 @@ export function Demo() {
             <Button icon={<LoginOutlined />} onClick={() => navigate('/login')}>
               Admin 登录
             </Button>
-            <Button onClick={() => navigate('/settings')}>
-              设置凭据
+            <Button type="primary" onClick={() => navigate('/signup')}>
+              注册正式账号
             </Button>
           </Space>
         </Space>

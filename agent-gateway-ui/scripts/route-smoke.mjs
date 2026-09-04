@@ -20,6 +20,7 @@ const SUMMARY_FILE = path.join(OUT_DIR, 'summary.md');
 /** 与 routes.tsx 对齐的路由清单（保持顺序以便 diff）。 */
 const ROUTES = [
   '/demo',
+  '/signup',
   '/dashboard',
   '/models',
   '/api-keys',
