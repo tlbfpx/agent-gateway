@@ -1,0 +1,25 @@
+# Patterns to ignore when building Helm packages.
+.DS_Store
+.git/
+.gitignore
+.bzr/
+.hg/
+.hgignore
+.svn/
+*.swp
+*.bak
+*.tmp
+*.orig
+*.rej
+*.tmproj
+.idea/
+.vscode/
+.project
+*.iml
+*.png
+*.gif
+*.jpg
+*.jpeg
+*.svg
+*.pdf
+README.md.gotmpl

@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "agent-gateway.fullname" . }}-config
+  labels: {{- include "agent-gateway.labels" . | nindent 4 }}
+data:
+  application.yml: |-
+    server:
+      port: 8080
+      shutdown: graceful
+    spring.lifecycle.timeout-per-shutdown-phase: 30s
+
+    spring:
+      application:
+        name: agent-gateway
+      main:
+        banner-mode: off
+      autoconfigure:
+        exclude:
+          # SAA DashScopeMultimodalEmbedding 打包缺陷
+          - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeMultimodalEmbeddingAutoConfiguration
+          # 自建 DataSource，不要 Boot 自动 Hikari
+          - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      flyway:
+        enabled: true
+        baseline-on-migrate: true
+        baseline-version: 0
+        locations: classpath:db/migration
+        table: flyway_schema_history
+        fail-on-missing-locations: true
+      ai:
+        dashscope:
+          api-key: ${DASHSCOPE_API_KEY:sk-placeholder}
+        deepseek:
+          api-key: ${DEEPSEEK_API_KEY:sk-placeholder}
+        openai:
+          api-key: ${OPENAI_API_KEY:sk-placeholder}
+        zhipuai:
+          api-key: ${ZHIPU_API_KEY:sk-placeholder}
+        minimax:
+          api-key: {{ .Values.config.gateway.llm.providerApiKey | default "sk-placeholder" }}
+          # 注：minimax 实际是 prod 真实 provider,deploy 时由 Secret 注入
+
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,metrics,prometheus
+      endpoint:
+        health:
+          probes:
+            enabled: true
+          show-details: when-authorized
+
+    gateway:
+      dev: {{ .Values.config.gateway.dev }}
+      llm:
+        fallback-tool-model: ${FALLBACK_TOOL_MODEL:""}
+        default-model: {{ .Values.config.gateway.llm.defaultModel | quote }}
+        prompt-cache:
+          enabled: {{ .Values.config.gateway.llm.promptCache.enabled }}
+          ttl: {{ .Values.config.gateway.llm.promptCache.ttl | quote }}
+          max-entries: {{ .Values.config.gateway.llm.promptCache.maxEntries }}
+      api-keys: {{ toYaml .Values.config.gateway.apiKeys | nindent 8 }}
+      security:
+        admin-token: ${GATEWAY_ADMIN_TOKEN:""}
+      demo:
+        enabled: {{ .Values.demo.enabled }}
+        ttl: {{ .Values.demo.ttl | quote }}
+        cleanup-interval: {{ .Values.demo.cleanupInterval | quote }}
+
+    observability:
+      storage:
+        enabled: {{ .Values.config.observability.storage.enabled }}
+        jdbc-url: {{ .Values.config.observability.storage.jdbcUrl | quote }}
+        username: {{ .Values.config.observability.storage.username | quote }}
+        # password 从 Secret 注入，配置里不出现
+
+    logging:
+      level:
+        root: {{ .Values.logging.level.root }}
+        com.company.agentgateway: {{ .Values.logging.level.comCompanyAgentgateway }}
+
+  logback-spring.xml: |2-
+    <configuration>
+      <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+      <property name="LOG_PATTERN"
+                value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"/>
+      <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+          <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+      </appender>
+      <root level="${LOGGING_LEVEL_ROOT:-INFO}">
+        <appender-ref ref="STDOUT"/>
+      </root>
+    </configuration>

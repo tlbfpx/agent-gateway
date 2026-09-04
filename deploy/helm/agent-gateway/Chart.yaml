@@ -1,0 +1,32 @@
+apiVersion: v2
+name: agent-gateway
+description: |
+  AI Agent 调用的统一网关：路由、限流、计费、审计、RBAC、缓存。
+  一键部署到 Kubernetes，含 Ingress / ConfigMap / Secret / HPA。
+type: application
+
+# Chart 版本（spec 2026-09-05 §helm-chart §2）
+version: 0.1.0
+
+# 应用版本（与 pom.xml 一致）
+appVersion: "0.1.0-SNAPSHOT"
+
+home: https://github.com/tlbfpx/agent-gateway
+sources:
+  - https://github.com/tlbfpx/agent-gateway
+
+keywords:
+  - ai
+  - gateway
+  - llm
+  - rbac
+  - audit
+  - billing
+
+maintainers:
+  - name: agent-gateway maintainers
+    email: noreply@example.com
+
+annotations:
+  category: AI Infrastructure
+  licenses: Apache-2.0

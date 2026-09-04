@@ -1,0 +1,32 @@
+agent-gateway 已部署 🎉
+
+1. 检查 Pod 状态：
+   kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "agent-gateway.name" . }}
+
+2. 端口转发（本地调试）：
+   kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "agent-gateway.fullname" . }} 8080:8080
+
+3. 健康检查：
+   curl http://localhost:8080/actuator/health
+
+4. 访问 UI{{ if .Values.ingress.enabled }}：
+   {{- range .Values.ingress.hosts }}
+   https://{{ .host }}{{ (index .paths 0).path }}
+   {{- end }}
+   {{- else }}
+   暂未启用 Ingress，可用 kubectl port-forward 访问。
+   {{- end }}
+
+5. Demo 模式{{ if .Values.demo.enabled }}：✅ 已启用（24h TTL 自动清理）
+   试用入口：{{- range .Values.ingress.hosts }} https://{{ .host }}/demo{{- end }}
+   {{- else }}：⚠️ 已关闭 — 用户需要走 /signup 自助注册
+   {{- end }}
+
+⚠️ 生产部署 checklist：
+   - 把 .Values.secrets.existingSecret 指向已有的 ExternalSecret / SOPS-managed Secret
+   - 设置强密码：.Values.secrets.gatewayAdminToken + observPostgresPassword
+   - 启用 PodDisruptionBudget（参考 docs/operators/PRODUCTION.md）
+   - 配置备份：TimescaleDB / PG 走 velero 或 pg_dump cron
+   - 打开 Prometheus 抓 /actuator/prometheus
+
+更多信息：https://github.com/tlbfpx/agent-gateway/tree/master/deploy/helm/agent-gateway

@@ -1,0 +1,142 @@
+# Default values for agent-gateway.
+# 完整文档见 README.md；本文件只列最常用字段。
+# 任何没列出的字段都会被 chart 模板的默认值兜底。
+
+# ---------- 镜像 ----------
+image:
+  repository: ghcr.io/tlbfpx/agent-gateway
+  pullPolicy: IfNotPresent
+  tag: ""  # 默认 = .Chart.AppVersion
+
+imagePullSecrets: []
+# - name: regcred
+
+# ---------- 副本 / 调度 ----------
+replicaCount: 2
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Pod 级调度
+podAnnotations: {}
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# ---------- Service ----------
+service:
+  type: ClusterIP
+  port: 8080
+  # targetPort: 8080  # 默认 = service.port
+
+# ---------- Ingress ----------
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "16m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+  hosts:
+    - host: gateway.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - gateway.example.com
+      secretName: gateway-tls
+
+# ---------- 横向扩缩（HPA）----------
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# ---------- ServiceAccount ----------
+serviceAccount:
+  create: true
+  name: ""  # 默认 = agent-gateway
+  annotations: {}
+
+# ---------- 应用配置（application.yml 覆写）----------
+config:
+  # 必填：observability 存储；生产请用外部 PG/TS
+  observability:
+    storage:
+      enabled: true
+      jdbcUrl: "jdbc:postgresql://agent-gateway-postgres:5432/agentgateway"
+      username: "agentg"
+      # password 走 Secret
+  # 网关业务配置
+  gateway:
+    dev: false
+    llm:
+      defaultModel: "minimax-abab6.5s-chat"
+      fallbackToolModel: ""
+      promptCache:
+        enabled: false
+        ttl: "10m"
+        maxEntries: 1000
+    apiKeys: []
+    # admin-token 走 Secret
+
+# ---------- Secrets ----------
+secrets:
+  # 这些值会塞到 Pod env，强烈建议生产用 External Secrets / SOPS
+  # 创建 Secret: kubectl create secret generic agent-gateway-secrets ...
+  existingSecret: ""  # 若设了，下面的 password/adminToken/openaiApiKey 都会被覆盖为 secret 里的同名 key
+  observPostgresPassword: "agentgateway"
+  gatewayAdminToken: ""  # 留空 = 关闭 admin 鉴权（向后兼容，不推荐生产）
+  openaiApiKey: "sk-placeholder"
+  dashscopeApiKey: "sk-placeholder"
+  deepseekApiKey: "sk-placeholder"
+  zhipuApiKey: "sk-placeholder"
+  minimaxApiKey: "sk-placeholder"
+
+# Demo 模式（spec 2026-09-04 §demo-mode）—— 生产部署建议关闭
+demo:
+  enabled: false
+  ttl: "24h"
+  cleanupInterval: "1h"
+
+# ---------- 探针 ----------
+probes:
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 60
+    periodSeconds: 30
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+# ---------- JVM ----------
+jvm:
+  heapMax: "512m"
+  extraOpts: "-XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/./urandom"
+
+# ---------- 日志 ----------
+logging:
+  level:
+    root: INFO
+    # 嵌套结构匹配 Spring Boot 的 logging.level.<logger>
+    comCompanyAgentgateway: INFO  # = logging.level.com.company.agentgateway
