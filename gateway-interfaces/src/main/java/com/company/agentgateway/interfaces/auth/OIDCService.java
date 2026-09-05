@@ -73,6 +73,11 @@ public class OIDCService {
         return config.isEnabled();
     }
 
+    /** 多租户 SaaS：tenantId → 是否被显式配置过（用于 /v1/auth/oidc/status 透出）。 */
+    public boolean hasTenantOverride(String tenantId) {
+        return config.tenantOverride(tenantId) != null;
+    }
+
     /** 暴露 discovery 客户端（controller 用）。 */
     public OidcDiscoveryClient discoveryClient() {
         return discoveryClient;
