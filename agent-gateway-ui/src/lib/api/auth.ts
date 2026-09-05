@@ -59,6 +59,41 @@ export const logout = () => {
   }).finally(() => clearAdminToken());
 };
 
+// ====================== OIDC SSO (Round 3 §sso-oidc) ======================
+
+/** OIDC 状态接口（spec 2026-09-05 §sso-oidc §6.2）。
+ *  Frontend 启动时调一次；若 enabled=true 显示「企业 SSO」按钮。 */
+export interface OidcStatus {
+  enabled: boolean;
+  /** 显示文案（多 IdP 时给个品牌名，便于切换） */
+  displayName?: string;
+}
+
+export const oidcStatus = () =>
+  fetch('/v1/auth/oidc/status').then(async (r) => {
+    if (r.status === 404) return { enabled: false } as OidcStatus;
+    if (!r.ok) throw new Error(`oidc status → ${r.status}`);
+    return (await r.json()) as OidcStatus;
+  });
+
+/** 触发 OIDC 登录：前端 GET 这个拿到 authorizationUrl，然后 location.href 跳。 */
+export interface OidcLoginResponse {
+  authorizationUrl: string;
+  state: string;
+  nonce: string;
+  returnTo: string;
+}
+
+export const oidcStartLogin = (returnTo = '/') =>
+  fetch(`/v1/auth/oidc/login?returnTo=${encodeURIComponent(returnTo)}`)
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.text();
+          throw new Error(`oidc login → ${r.status} ${body}`);
+        }
+        return (await r.json()) as OidcLoginResponse;
+      });
+
 export const getMe = (token: string) =>
   fetch('/v1/admin/auth/me', {
     method: 'POST',
