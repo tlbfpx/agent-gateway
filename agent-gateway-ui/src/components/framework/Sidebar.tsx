@@ -23,6 +23,7 @@ import {
   NodeIndexOutlined,
   BranchesOutlined,
   ReloadOutlined,
+  RocketOutlined,
   ExperimentOutlined,
 } from '@ant-design/icons';
 import { useSidebarCounts, getCount, isCritical } from '../../hooks/useSidebarCounts';
@@ -105,6 +106,15 @@ const GROUPS: { title: string; items: NavDef[] }[] = [
       { key: '/chat', icon: <MessageOutlined />, label: '对话测试' },
       { key: '/help', icon: <CodeOutlined />, label: '帮助' },
       { key: '/settings', icon: <SettingOutlined />, label: '设置' },
+    ],
+  },
+  {
+    title: '项目',
+    items: [
+      { key: '/getting-started', icon: <RocketOutlined />, label: '快速上手' },
+      { key: '/changelog', icon: <HistoryOutlined />, label: '更新日志' },
+      { key: '/pricing', icon: <DollarOutlined />, label: '定价' },
+      { key: '/status', icon: <ClusterOutlined />, label: '系统状态' },
     ],
   },
 ];
