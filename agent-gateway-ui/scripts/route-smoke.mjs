@@ -22,6 +22,7 @@ const ROUTES = [
   '/demo',
   '/signup',
   '/status',
+  '/changelog',
   '/dashboard',
   '/models',
   '/api-keys',
