@@ -16,7 +16,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -44,6 +46,8 @@ public class OIDCService {
 
     private final OIDCConfig config;
     private final OidcStateStore stateStore;
+    private final OidcJwksClient jwksClient;
+    private final OidcDiscoveryClient discoveryClient;
     private final AdminUserRepository adminUserRepo;
     private final AdminAuthService adminAuthService;
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -53,10 +57,14 @@ public class OIDCService {
 
     public OIDCService(OIDCConfig config,
                        OidcStateStore stateStore,
+                       OidcJwksClient jwksClient,
+                       OidcDiscoveryClient discoveryClient,
                        AdminUserRepository adminUserRepo,
                        AdminAuthService adminAuthService) {
         this.config = config;
         this.stateStore = stateStore;
+        this.jwksClient = jwksClient;
+        this.discoveryClient = discoveryClient;
         this.adminUserRepo = adminUserRepo;
         this.adminAuthService = adminAuthService;
     }
@@ -91,14 +99,17 @@ public class OIDCService {
         Map<String, String> params = new LinkedHashMap<>();
         params.put("response_type", "code");
         params.put("client_id", clientId);
-        params.put("redirect_uri", issuer.endsWith("/") ? issuer + "callback" : issuer + "/callback");
+        params.put("redirect_uri", redirectUri(issuer));
         params.put("scope", String.join(" ", config.getScopes()));
         params.put("state", packedState);
         params.put("nonce", nonce);
 
-        StringBuilder url = new StringBuilder(issuer);
-        if (!issuer.endsWith("/")) url.append('/');
-        url.append("authorize?");
+        // Round 4：用 discovery 解析的 authorization_endpoint；fallback {issuer}/authorize
+        String authEndpoint = discoveryClient.resolve(issuer).authorization();
+        StringBuilder url = new StringBuilder(authEndpoint);
+        // 保留 query string 模式（URL 可能自带 ?）
+        if (!authEndpoint.contains("?")) url.append('?');
+        else url.append('&');
         boolean first = true;
         for (var e : params.entrySet()) {
             if (!first) url.append('&');
@@ -168,13 +179,14 @@ public class OIDCService {
 
     private OidcTokenResponse exchangeCode(String codeCode) {
         String issuer = config.getIssuer();
-        String tokenUrl = issuer.endsWith("/") ? issuer + "token" : issuer + "/token";
+        String tokenUrl = discoveryClient.resolve(issuer).token();
+        String redirectUri = redirectUri(issuer);
         Map<String, String> form = new LinkedHashMap<>();
         form.put("grant_type", "authorization_code");
         form.put("code", codeCode);
         form.put("client_id", config.getClientId());
         form.put("client_secret", config.getClientSecret());
-        form.put("redirect_uri", issuer.endsWith("/") ? issuer + "callback" : issuer + "/callback");
+        form.put("redirect_uri", redirectUri);
 
         StringBuilder body = new StringBuilder();
         boolean first = true;
@@ -207,8 +219,7 @@ public class OIDCService {
     // ============================= userinfo =============================
 
     private OidcUserInfo fetchUserInfo(String accessToken) {
-        String issuer = config.getIssuer();
-        String userInfoUrl = issuer.endsWith("/") ? issuer + "userinfo" : issuer + "/userinfo";
+        String userInfoUrl = discoveryClient.resolve(config.getIssuer()).userinfo();
         try {
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(URI.create(userInfoUrl))
@@ -227,9 +238,9 @@ public class OIDCService {
         }
     }
 
-    // ============================= ID token claims 校验 =============================
+    // ============================= ID token 验证（签名 + claims）=============================
 
-    /** round 2：仅校验 iss / aud / exp claim。round 3 加 RS256 + JWKS。 */
+    /** round 3：RS256 签名验证 + iss / aud / exp 校验。 */
     private void verifyIdTokenClaims(String idToken) {
         if (idToken == null || idToken.isBlank()) {
             throw new IllegalArgumentException("id_token missing");
@@ -238,31 +249,75 @@ public class OIDCService {
         if (parts.length != 3) {
             throw new IllegalArgumentException("id_token not a JWT");
         }
+
+        // 1) header：取 alg + kid
+        @SuppressWarnings("unchecked")
+        Map<String, Object> header = parseJsonSegment(parts[0], Map.class);
+        String alg = (String) header.get("alg");
+        String kid = (String) header.get("kid");
+        if (!"RS256".equals(alg)) {
+            throw new IllegalArgumentException("unsupported alg: " + alg + " (only RS256)");
+            // 拒掉 'none' 与弱算法；其他算法下轮加
+        }
+        if (kid == null || kid.isBlank()) {
+            throw new IllegalArgumentException("id_token missing kid");
+        }
+
+        // 2) 签名验证
         try {
-            String payloadJson = new String(
-                    Base64.getUrlDecoder().decode(parts[1]),
-                    StandardCharsets.UTF_8);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> claims = json.readValue(payloadJson, Map.class);
-            String iss = (String) claims.get("iss");
-            String aud = (String) claims.get("aud");
-            Number exp = (Number) claims.get("exp");
-            String configIssuer = config.getIssuer();
-            if (configIssuer != null && !configIssuer.isBlank()
-                    && !stripTrailingSlash(configIssuer).equals(stripTrailingSlash(iss))) {
-                throw new IllegalArgumentException("id_token iss mismatch: " + iss);
-            }
-            if (aud != null && !aud.equals(config.getClientId())) {
-                // aud 可以是 string 或 array；这里简化处理 string
-                throw new IllegalArgumentException("id_token aud mismatch: " + aud);
-            }
-            if (exp != null && Instant.now().getEpochSecond() >= exp.longValue()) {
-                throw new IllegalArgumentException("id_token expired");
+            PublicKey publicKey = jwksClient.getPublicKey(config.getIssuer(), kid);
+            Signature verifier = Signature.getInstance("SHA256withRSA");
+            verifier.initVerify(publicKey);
+            // signed input = header.payload（两段原始 base64url，不带 padding 也不解码）
+            verifier.update((parts[0] + "." + parts[1]).getBytes(StandardCharsets.US_ASCII));
+            byte[] signature = Base64.getUrlDecoder().decode(parts[2]);
+            if (!verifier.verify(signature)) {
+                throw new IllegalArgumentException("id_token signature invalid");
             }
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception e) {
-            throw new IllegalArgumentException("id_token parse failed: " + e.getMessage(), e);
+            throw new IllegalArgumentException("id_token verify error: " + e.getMessage(), e);
+        }
+
+        // 3) claims
+        @SuppressWarnings("unchecked")
+        Map<String, Object> claims = parseJsonSegment(parts[1], Map.class);
+        String iss = (String) claims.get("iss");
+        Object audRaw = claims.get("aud");
+        Number exp = (Number) claims.get("exp");
+        String configIssuer = config.getIssuer();
+        if (configIssuer != null && !configIssuer.isBlank()
+                && !stripTrailingSlash(configIssuer).equals(stripTrailingSlash(iss))) {
+            throw new IllegalArgumentException("id_token iss mismatch: " + iss);
+        }
+        if (audRaw != null && !audienceMatches(audRaw, config.getClientId())) {
+            throw new IllegalArgumentException("id_token aud mismatch: " + audRaw);
+        }
+        if (exp != null && Instant.now().getEpochSecond() >= exp.longValue()) {
+            throw new IllegalArgumentException("id_token expired");
+        }
+    }
+
+    /** aud 可能是 string 或 string[]（多 audience 的 IdP 会返回数组）。 */
+    private static boolean audienceMatches(Object audRaw, String expected) {
+        if (audRaw instanceof String s) return s.equals(expected);
+        if (audRaw instanceof java.util.List<?> list) {
+            for (Object o : list) {
+                if (o instanceof String s && s.equals(expected)) return true;
+            }
+        }
+        return false;
+    }
+
+    private <T> T parseJsonSegment(String segment, Class<T> type) {
+        try {
+            String jsonStr = new String(
+                    Base64.getUrlDecoder().decode(segment),
+                    StandardCharsets.UTF_8);
+            return json.readValue(jsonStr, type);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("JWT segment parse failed: " + e.getMessage(), e);
         }
     }
 
@@ -296,6 +351,13 @@ public class OIDCService {
 
     private static String stripTrailingSlash(String s) {
         return s != null && s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
+    }
+
+    /** Round 4：redirect_uri 走 discovery 解析的 baseUri；
+     *  fallback 时按 issuer 派生 {issuer}/callback。 */
+    private String redirectUri(String issuer) {
+        // 简化：固定用 issuer 派生（RFC 6749 §3.1.2 允许与 IdP 配合）
+        return issuer.endsWith("/") ? issuer + "callback" : issuer + "/callback";
     }
 
     private static String sanitize(String s) {

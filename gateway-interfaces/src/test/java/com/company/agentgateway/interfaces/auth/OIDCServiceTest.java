@@ -39,6 +39,7 @@ class OIDCServiceTest {
     private OIDCConfig config;
     private OidcStateStore stateStore;
     private OidcJwksClient jwksClient;
+    private OidcDiscoveryClient discoveryClient;
     private AdminUserRepository adminUserRepo;
     private AdminAuthService adminAuthService;
     private OIDCService oidc;
@@ -54,9 +55,19 @@ class OIDCServiceTest {
         config.setDefaultRedirectReturnTo("/");
         stateStore = mock(OidcStateStore.class);
         jwksClient = mock(OidcJwksClient.class);
+        discoveryClient = mock(OidcDiscoveryClient.class);
+        // 默认 discovery fallback 到 issuer 派生（模拟 IdP 不开 discovery）
+        when(discoveryClient.resolve(anyString())).thenAnswer(inv -> {
+            String issuer = inv.getArgument(0);
+            String base = issuer.endsWith("/") ? issuer.substring(0, issuer.length() - 1) : issuer;
+            return new OidcDiscoveryClient.Endpoints(
+                    base + "/authorize", base + "/token", base + "/userinfo",
+                    base + "/.well-known/jwks.json", true);
+        });
         adminUserRepo = mock(AdminUserRepository.class);
         adminAuthService = mock(AdminAuthService.class);
-        oidc = new OIDCService(config, stateStore, jwksClient, adminUserRepo, adminAuthService);
+        oidc = new OIDCService(config, stateStore, jwksClient, discoveryClient,
+                adminUserRepo, adminAuthService);
     }
 
     // ====================== login 端 ======================
