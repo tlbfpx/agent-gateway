@@ -75,6 +75,17 @@ gateway:
     enabled: ${GATEWAY_DEMO_ENABLED:false}
     ttl: ${GATEWAY_DEMO_TTL:PT24H}
     cleanup-interval: ${GATEWAY_DEMO_CLEANUP_INTERVAL:PT1H}
+  # OIDC SSO（spec 2026-09-05 §sso-oidc）：prod 默认关闭；企业客户打开
+  # + 配置 issuer / client-id / client-secret 后启用。
+  # 启用后 /v1/auth/oidc/login 返回 IdP 跳转 URL；
+  # /v1/auth/oidc/callback（下轮实现）落地。
+  oidc:
+    enabled: ${OIDC_ENABLED:false}
+    issuer: ${OIDC_ISSUER:}
+    client-id: ${OIDC_CLIENT_ID:}
+    client-secret: ${OIDC_CLIENT_SECRET:}
+    scopes: ${OIDC_SCOPES:openid,email,profile}
+    default-redirect-return-to: ${OIDC_DEFAULT_RETURN_TO:/}
   # 模型列表改由管理员菜单配置（POST /v1/admin/models），持久化 data/models.json；此处不再静态声明
 # Nacos 配置中心（ModelRegistry 用裸 nacos-client；配 nacos.addr 才条件装配 infra-llm 全链路）
 # nacos:

@@ -1,6 +1,7 @@
 package com.company.agentgateway.bootstrap;
 
 import com.company.agentgateway.application.billing.StripeStubAdapter;
+import com.company.agentgateway.interfaces.auth.OIDCConfig;
 import com.company.agentgateway.interfaces.demo.DemoConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "com.company.agentgateway.interfaces",
     "com.company.agentgateway.infra"
 })
-@EnableConfigurationProperties(DemoConfig.class)
+@EnableConfigurationProperties({DemoConfig.class, OIDCConfig.class})
 @EnableScheduling
 public class GatewayApplication {
     public static void main(String[] args) {
