@@ -1,5 +1,6 @@
 package com.company.agentgateway.interfaces.auth;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -46,28 +50,51 @@ public class OIDCController {
     }
 
     /**
-     * IdP 回调端。生产应该用前端 SPA 接：浏览器先到本端点拿 session，
-     * 拿完 set-cookie + 302 到 returnTo；或前端用 fetch + 自行 set localStorage。
+     * IdP 回调端。默认浏览器场景：302 redirect 到 {@code returnTo}，token 放 URL
+     * fragment（#token=...）→ 前端 /oauth/callback 解析并存 localStorage。
+     *
+     * <p>API 场景：传 {@code redirect=false} 返回 JSON（机器集成 / 调试用）。
      */
     @GetMapping("/callback")
-    public Map<String, Object> callback(
+    public Object callback(
             @RequestParam("code") String code,
             @RequestParam("state") String state,
-            @RequestParam(value = "nonce", required = false) String nonce) {
+            @RequestParam(value = "nonce", required = false) String nonce,
+            @RequestParam(value = "redirect", defaultValue = "true") boolean redirect,
+            HttpServletResponse httpResp) throws IOException {
         ensureEnabled();
+        OIDCService.OidcLoginResult r;
         try {
-            OIDCService.OidcLoginResult r = oidcService.handleCallback(code, state, nonce);
-            Map<String, Object> out = new LinkedHashMap<>();
-            out.put("tenantId", r.tenantId());
-            out.put("email", r.email());
-            out.put("adminToken", r.adminToken());
-            out.put("returnTo", r.returnTo());
-            return out;
+            r = oidcService.handleCallback(code, state, nonce);
         } catch (IllegalArgumentException ex) {
+            if (redirect) {
+                String safeMsg = URLEncoder.encode(ex.getMessage(), StandardCharsets.UTF_8);
+                httpResp.sendRedirect("/login?error=" + safeMsg);
+                return null;
+            }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
         }
+
+        if (redirect) {
+            // token 放 URL fragment（不进 HTTP referer / server log）
+            String safe = URLEncoder.encode(r.adminToken(), StandardCharsets.UTF_8);
+            String tenant = URLEncoder.encode(r.tenantId(), StandardCharsets.UTF_8);
+            String email = URLEncoder.encode(r.email(), StandardCharsets.UTF_8);
+            String target = "/oauth/callback"
+                    + "?returnTo=" + URLEncoder.encode(r.returnTo(), StandardCharsets.UTF_8)
+                    + "#token=" + safe + "&tenant=" + tenant + "&email=" + email;
+            httpResp.sendRedirect(target);
+            return null;
+        }
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("tenantId", r.tenantId());
+        out.put("email", r.email());
+        out.put("adminToken", r.adminToken());
+        out.put("returnTo", r.returnTo());
+        return out;
     }
 
     private void ensureEnabled() {
