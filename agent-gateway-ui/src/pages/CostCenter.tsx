@@ -126,7 +126,7 @@ export function CostCenter() {
     setLoading(true);
     setError('');
     try {
-      setReport(await loadCostReport(range));
+      setReport(await loadCostReport(range as Parameters<typeof loadCostReport>[0]));
     } catch (e: any) {
       setError(e?.message ?? '加载失败');
     } finally {
@@ -268,14 +268,15 @@ export function CostCenter() {
                 data={timeseries}
                 range={range}
                 metric="cost"
-                empty={!report}
+                title="成本走势"
+                unit="元"
               />
             </Col>
             <Col xs={24} lg={8}>
               <ModelSharePie
-                slices={breakdown.map((b) => ({ label: b.name, value: b.costCny }))}
+                slices={breakdown.map((b) => ({ label: b.label, value: b.costCny }))}
                 total={breakdown.reduce((acc, b) => acc + b.costCny, 0)}
-                empty={!report}
+                title="成本占比"
               />
             </Col>
           </Row>
@@ -286,7 +287,6 @@ export function CostCenter() {
                 previousLabel={compare.previousLabel}
                 currentValue={compare.currentValue}
                 previousValue={compare.previousValue}
-                deltaPct={compare.deltaPct}
               />
             </Col>
           </Row>

@@ -21,7 +21,7 @@ import {
  * Gateway + Route 管理,模拟 kubectl apply 体验。
  */
 export function K8sGateways() {
-  const [namespace, setNamespace] = useUrlState('namespace', 'default');
+  const [namespace, setNamespace] = useUrlState<string>('namespace', 'default');
   const [gateways, setGateways] = useState<K8sGateway[]>([]);
   const [routes, setRoutes] = useState<K8sRoute[]>([]);
   const [selected, setSelected] = useState<K8sGateway | null>(null);

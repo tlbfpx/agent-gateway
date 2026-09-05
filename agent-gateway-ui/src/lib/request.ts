@@ -223,8 +223,9 @@ export function notifyError(err: Error, context: string): void {
 
   // toast 即时反馈（antd 静态 API，方便 hook/非 React 上下文调用）
   try {
-    const { message } = require('antd');
-    message.error(`${context}：${err.message}`);
+    void import('antd').then(({ message }) => {
+      message.error(`${context}：${err.message}`);
+    });
   } catch {
     /* antd 未在上下文：静默吞掉（仅去重记录仍生效） */
   }

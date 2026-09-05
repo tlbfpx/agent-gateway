@@ -63,13 +63,13 @@ function TraceList({ onSelect }: { onSelect: (id: string) => void }) {
   // Round 11 §ui-b5:筛选 URL 持久化(刷新/分享保留状态)
   const [range, setRange] = useUrlState('range', '1h');
   const [operation, setOperation] = useUrlState('operation', '' as string);
-  const [errorOnly, setErrorOnly] = useUrlState('errorOnly', false);
+  const [errorOnly, setErrorOnly] = useUrlState<boolean>('errorOnly', false);
   const [minDuration, setMinDuration] = useUrlState('minDuration', 0 as number);
   const [tenantId, setTenantId] = useUrlState('tenantId', '' as string);
   const [rows, setRows] = useState<TraceSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [autoRefresh, setAutoRefresh] = useUrlState('autoRefresh', true);
+  const [autoRefresh, setAutoRefresh] = useUrlState<boolean>('autoRefresh', true);
 
   const load = useCallback(async () => {
     try {
@@ -136,7 +136,7 @@ function TraceList({ onSelect }: { onSelect: (id: string) => void }) {
           placeholder="最短耗时 ms"
           min={0}
           value={minDuration}
-          onChange={setMinDuration}
+          onChange={(v) => setMinDuration(v ?? 0)}
           style={{ width: 120 }}
         />
         <Input
@@ -148,12 +148,12 @@ function TraceList({ onSelect }: { onSelect: (id: string) => void }) {
         />
         <Tooltip title="只看有错误的链路">
           <span>
-            错误 <Switch size="small" checked={errorOnly} onChange={setErrorOnly} />
+            错误 <Switch size="small" checked={errorOnly} onChange={(v) => setErrorOnly(v)} />
           </span>
         </Tooltip>
         <Tooltip title="30 秒自动刷新">
           <span>
-            自动 <Switch size="small" checked={autoRefresh} onChange={setAutoRefresh} />
+            自动 <Switch size="small" checked={autoRefresh} onChange={(v) => setAutoRefresh(v)} />
           </span>
         </Tooltip>
         <Button icon={<ReloadOutlined />} onClick={() => void load()} loading={loading}>

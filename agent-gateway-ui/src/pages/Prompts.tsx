@@ -24,7 +24,7 @@ const SELECTED_KEY = 'prompts.selected';
  * 列表 + 详情(版本树) + 创建 Template + 添加 Version + 创建 A/B Experiment + 查看 summary
  */
 export function Prompts() {
-  const [tenant, setTenant] = useUrlState('tenant', 'au');
+  const [tenant, setTenant] = useUrlState<string>('tenant', 'au');
   const [templates, setTemplates] = useState<PromptTemplate[]>([]);
   const [selected, setSelected] = useState<PromptTemplate | null>(null);
   const [versions, setVersions] = useState<PromptVersion[]>([]);

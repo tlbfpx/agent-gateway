@@ -36,16 +36,17 @@ function parseBoolean(raw: string | null, fallback: boolean): boolean {
   return raw === 'true' || raw === '1';
 }
 
-export function useUrlState(key: string, defaultValue: string): [string, Setter<string>];
-export function useUrlState(key: string, defaultValue: number): [number, Setter<number>];
-export function useUrlState(key: string, defaultValue: boolean): [boolean, Setter<boolean>];
+export function useUrlState<T extends string | number | boolean>(
+  key: string,
+  defaultValue: T,
+): [T, Setter<T>];
 export function useUrlState(
   key: string,
   defaultValue: string | number | boolean,
 ): [string | number | boolean, Setter<string | number | boolean>] {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const readFromUrl = useCallback(() => {
+  const readFromUrl = useCallback((): string | number | boolean => {
     const raw = searchParams.get(key);
     if (raw === null) return defaultValue;
     if (typeof defaultValue === 'number') return parseNumber(raw, defaultValue);

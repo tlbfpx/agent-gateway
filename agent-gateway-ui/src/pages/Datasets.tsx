@@ -24,7 +24,7 @@ const SAMPLE_JSONL = `{"input":"hello","expected":"Hello! How can I help?"}
  * /datasets 数据集 + 评测管理页（Round 13 §dataset-eval §7 UI）。
  */
 export function Datasets() {
-  const [tenant, setTenant] = useUrlState('tenant', 'au');
+  const [tenant, setTenant] = useUrlState<string>('tenant', 'au');
   const [datasets, setDatasets] = useState<EvalDataset[]>([]);
   const [selected, setSelected] = useState<EvalDataset | null>(null);
   const [cases, setCases] = useState<any[]>([]);
