@@ -83,11 +83,11 @@ public class OIDCController {
         if (redirect) {
             // token 放 URL fragment（不进 HTTP referer / server log）
             String safe = URLEncoder.encode(r.adminToken(), StandardCharsets.UTF_8);
-            String tenant = URLEncoder.encode(r.tenantId(), StandardCharsets.UTF_8);
+            String tenantInfo = URLEncoder.encode(r.tenantId(), StandardCharsets.UTF_8);
             String email = URLEncoder.encode(r.email(), StandardCharsets.UTF_8);
             String target = "/oauth/callback"
                     + "?returnTo=" + URLEncoder.encode(r.returnTo(), StandardCharsets.UTF_8)
-                    + "#token=" + safe + "&tenant=" + tenant + "&email=" + email;
+                    + "#token=" + safe + "&tenant=" + tenantInfo + "&email=" + email;
             httpResp.sendRedirect(target);
             return null;
         }

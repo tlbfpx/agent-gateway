@@ -78,6 +78,11 @@ public class OIDCService {
         return config.tenantOverride(tenantId) != null;
     }
 
+    /** 多租户 SaaS：已配 tenant override 数量（不暴露具体 tenantId 列表）。 */
+    public int tenantOverrideCount() {
+        return config.getTenants() != null ? config.getTenants().size() : 0;
+    }
+
     /** 暴露 discovery 客户端（controller 用）。 */
     public OidcDiscoveryClient discoveryClient() {
         return discoveryClient;
