@@ -60,7 +60,7 @@ class OIDCServiceTest {
         when(discoveryClient.resolve(anyString())).thenAnswer(inv -> {
             String issuer = inv.getArgument(0);
             String base = issuer.endsWith("/") ? issuer.substring(0, issuer.length() - 1) : issuer;
-            return new OidcDiscoveryClient.Endpoints(
+            return OidcDiscoveryClient.Endpoints.withoutEndSession(
                     base + "/authorize", base + "/token", base + "/userinfo",
                     base + "/.well-known/jwks.json", true);
         });

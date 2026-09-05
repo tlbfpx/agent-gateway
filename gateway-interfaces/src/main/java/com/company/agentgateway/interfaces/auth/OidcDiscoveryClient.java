@@ -53,12 +53,13 @@ public class OidcDiscoveryClient {
                     c.doc.token_endpoint(),
                     c.doc.userinfo_endpoint(),
                     c.doc.jwks_uri(),
+                    c.doc.end_session_endpoint(),
                     false);
         }
         // Fallback：未发现 / discovery 失败 → 拼 URL
         String base = issuer.endsWith("/") ? issuer.substring(0, issuer.length() - 1) : issuer;
         log.info("oidc.discovery.fallback issuer={}", issuer);
-        return new Endpoints(
+        return Endpoints.withoutEndSession(
                 base + "/authorize",
                 base + "/token",
                 base + "/userinfo",
@@ -119,5 +120,13 @@ public class OidcDiscoveryClient {
             String token,
             String userinfo,
             String jwks,
-            boolean isFallback) {}
+            String endSession,
+            boolean isFallback) {
+
+        public static Endpoints withoutEndSession(String authorization, String token,
+                                                  String userinfo, String jwks,
+                                                  boolean isFallback) {
+            return new Endpoints(authorization, token, userinfo, jwks, null, isFallback);
+        }
+    }
 }

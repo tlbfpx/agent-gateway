@@ -58,4 +58,7 @@ public class OIDCConfig {
     public void setDefaultRedirectReturnTo(String defaultRedirectReturnTo) {
         this.defaultRedirectReturnTo = defaultRedirectReturnTo;
     }
+
+    /** 配置自检端点：OIDC 启用时返回 issuer，否则 null（前端判断要不要展示 SSO 入口）。 */
+    public String getId() { return enabled ? issuer : null; }
 }

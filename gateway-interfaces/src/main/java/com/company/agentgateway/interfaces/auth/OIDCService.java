@@ -73,6 +73,16 @@ public class OIDCService {
         return config.isEnabled();
     }
 
+    /** 暴露 discovery 客户端（controller 用）。 */
+    public OidcDiscoveryClient discoveryClient() {
+        return discoveryClient;
+    }
+
+    /** 暴露 config（controller / logout 用）。 */
+    public OIDCConfig config() {
+        return config;
+    }
+
     /**
      * login 端：构造 authorization URL + state 存入 store。
      */

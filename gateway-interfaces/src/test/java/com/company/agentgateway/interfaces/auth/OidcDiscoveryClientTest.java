@@ -28,6 +28,7 @@ class OidcDiscoveryClientTest {
         assertThat(ep.token()).isEqualTo("https://invalid.example.test/token");
         assertThat(ep.userinfo()).isEqualTo("https://invalid.example.test/userinfo");
         assertThat(ep.jwks()).isEqualTo("https://invalid.example.test/.well-known/jwks.json");
+        assertThat(ep.endSession()).isNull(); // fallback 不假设 end_session_endpoint
     }
 
     @Test

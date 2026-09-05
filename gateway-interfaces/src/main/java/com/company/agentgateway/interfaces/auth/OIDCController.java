@@ -75,4 +75,49 @@ public class OIDCController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "OIDC is disabled");
         }
     }
+
+    /**
+     * OIDC RP-Initiated Logout（spec 2026-09-05 §sso-oidc §6）。
+     *
+     * <p>前端拿不到 IdP session cookie（浏览器跨域），所以必须服务端 redirect 到
+     * IdP 的 end_session_endpoint，IdP 端清完 session 后回调回 returnTo。
+     *
+     * <p>本地 token 由前端 clear（logout 函数）；IdP session 由本端点触发清理。
+     * IdP 端若有 id_token_hint 校验，需要前端先调 /v1/admin/auth/me 拿当前 userinfo
+     * 再发起（spec §5.2）—— 本轮先用 post_logout_redirect_uri 简化版。
+     */
+    @GetMapping("/logout")
+    public Map<String, Object> logout(
+            @RequestParam(value = "returnTo", required = false) String returnTo) {
+        ensureEnabled();
+        String endSession = oidcService.discoveryClient()
+                .resolve(oidcService.config().getIssuer()).endSession();
+        if (endSession == null || endSession.isBlank()) {
+            // IdP 没暴露 end_session_endpoint：返回空对象让前端 fallback 到本地 logout
+            Map<String, Object> out = new LinkedHashMap<>();
+            out.put("endSessionEndpoint", null);
+            out.put("reason", "IdP does not advertise end_session_endpoint");
+            return out;
+        }
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("post_logout_redirect_uri", returnTo != null ? returnTo : "/login");
+        params.put("client_id", oidcService.config().getClientId());
+
+        StringBuilder url = new StringBuilder(endSession);
+        if (!endSession.contains("?")) url.append('?');
+        else url.append('&');
+        boolean first = true;
+        for (var e : params.entrySet()) {
+            if (!first) url.append('&');
+            url.append(java.net.URLEncoder.encode(e.getKey(),
+                    java.nio.charset.StandardCharsets.UTF_8));
+            url.append('=');
+            url.append(java.net.URLEncoder.encode(e.getValue(),
+                    java.nio.charset.StandardCharsets.UTF_8));
+            first = false;
+        }
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("endSessionEndpoint", url.toString());
+        return out;
+    }
 }
