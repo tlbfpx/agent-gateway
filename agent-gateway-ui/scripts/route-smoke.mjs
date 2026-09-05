@@ -24,6 +24,7 @@ const ROUTES = [
   '/status',
   '/changelog',
   '/getting-started',
+  '/pricing',
   '/dashboard',
   '/models',
   '/api-keys',

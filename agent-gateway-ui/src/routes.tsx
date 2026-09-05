@@ -41,6 +41,7 @@ import { Signup } from './pages/Signup';
 import { Status } from './pages/Status';
 import { Changelog } from './pages/Changelog';
 import { GettingStarted } from './pages/GettingStarted';
+import { Pricing } from './pages/Pricing';
 
 /** 根据 localStorage 决定首屏跳转：无凭据 → /demo；已有 → /dashboard。
  *  这个函数由 React Router 在 index 路由渲染时同步调用，避免异步检测闪烁。 */
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
       { path: 'status', element: <Status /> },
       { path: 'changelog', element: <Changelog /> },
       { path: 'getting-started', element: <GettingStarted /> },
+      { path: 'pricing', element: <Pricing /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'models', element: <ModelsList /> },
       { path: 'api-keys', element: <ApiKeysList /> },
