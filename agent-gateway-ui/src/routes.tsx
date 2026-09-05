@@ -44,6 +44,7 @@ import { GettingStarted } from './pages/GettingStarted';
 import { Pricing } from './pages/Pricing';
 import { Terms } from './pages/Legal';
 import { OAuthCallback } from './pages/OAuthCallback';
+import { Contact } from './pages/Contact';
 
 /** 根据 localStorage 决定首屏跳转：无凭据 → /demo；已有 → /dashboard。
  *  这个函数由 React Router 在 index 路由渲染时同步调用，避免异步检测闪烁。 */
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
       { path: 'legal/terms', element: <Terms kind="terms" /> },
       { path: 'legal/privacy', element: <Terms kind="privacy" /> },
       { path: 'oauth/callback', element: <OAuthCallback /> },
+      { path: 'contact', element: <Contact /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'models', element: <ModelsList /> },
       { path: 'api-keys', element: <ApiKeysList /> },

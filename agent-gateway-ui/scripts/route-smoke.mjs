@@ -25,6 +25,7 @@ const ROUTES = [
   '/changelog',
   '/getting-started',
   '/pricing',
+  '/contact',
   '/legal/terms',
   '/legal/privacy',
   '/dashboard',

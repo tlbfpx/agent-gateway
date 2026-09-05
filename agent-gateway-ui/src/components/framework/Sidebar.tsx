@@ -115,6 +115,7 @@ const GROUPS: { title: string; items: NavDef[] }[] = [
       { key: '/changelog', icon: <HistoryOutlined />, label: '更新日志' },
       { key: '/pricing', icon: <DollarOutlined />, label: '定价' },
       { key: '/status', icon: <ClusterOutlined />, label: '系统状态' },
+      { key: '/contact', icon: <MessageOutlined />, label: '联系我们' },
     ],
   },
 ];
