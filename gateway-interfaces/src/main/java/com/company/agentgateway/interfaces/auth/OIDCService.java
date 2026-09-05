@@ -88,18 +88,38 @@ public class OIDCService {
         return config;
     }
 
+    /** 兼容旧 API：null tenantId → 走全局。 */
+    public AuthRequest buildAuthorizationRequest(String returnTo) {
+        return buildAuthorizationRequest(returnTo, null);
+    }
+
     /**
      * login 端：构造 authorization URL + state 存入 store。
+     *
+     * @param tenantId  多租户 SaaS 用：null → 走全局配置；非 null → 优先 tenants.<tenantId>
      */
-    public AuthRequest buildAuthorizationRequest(String returnTo) {
+    public AuthRequest buildAuthorizationRequest(String returnTo, String tenantId) {
         if (!config.isEnabled()) {
             throw new IllegalStateException("OIDC is disabled");
         }
-        String issuer = config.getIssuer();
+
+        // 多租户 SaaS：tenant override 命中 → 用其 issuer/client/scopes
+        OIDCConfig.TenantOverride override =
+                tenantId != null ? config.tenantOverride(tenantId) : null;
+
+        String issuer = override != null && !override.getIssuer().isBlank()
+                ? override.getIssuer() : config.getIssuer();
+        String clientId = override != null && !override.getClientId().isBlank()
+                ? override.getClientId() : config.getClientId();
+        String clientSecret = override != null
+                ? override.getClientSecret() : config.getClientSecret();
+        java.util.List<String> scopes = override != null && override.getScopes() != null
+                && !override.getScopes().isEmpty()
+                ? override.getScopes() : config.getScopes();
+
         if (issuer == null || issuer.isBlank()) {
             throw new IllegalStateException("gateway.oidc.issuer not configured");
         }
-        String clientId = config.getClientId();
         if (clientId == null || clientId.isBlank()) {
             throw new IllegalStateException("gateway.oidc.client-id not configured");
         }
@@ -108,21 +128,24 @@ public class OIDCService {
         String effectiveReturnTo = (returnTo == null || returnTo.isBlank())
                 ? config.getDefaultRedirectReturnTo() : returnTo;
 
-        String packedState = state + "." + base64Url(effectiveReturnTo.getBytes(StandardCharsets.UTF_8));
-        stateStore.put(state, nonce); // 用 raw state 存，不带 returnTo（returnTo 在 callback 拆）
+        // state 打包 tenantId（让 callback 能路由回对应配置做 token exchange / JWKS 验签）
+        String packedState = state + "."
+                + base64Url(effectiveReturnTo.getBytes(StandardCharsets.UTF_8))
+                + "."
+                + base64Url((tenantId == null ? "" : tenantId).getBytes(StandardCharsets.UTF_8));
+        stateStore.put(state, nonce);
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put("response_type", "code");
         params.put("client_id", clientId);
         params.put("redirect_uri", redirectUri(issuer));
-        params.put("scope", String.join(" ", config.getScopes()));
+        params.put("scope", String.join(" ", scopes));
         params.put("state", packedState);
         params.put("nonce", nonce);
 
-        // Round 4：用 discovery 解析的 authorization_endpoint；fallback {issuer}/authorize
+        // Discovery 解析 authorization_endpoint；fallback {issuer}/authorize
         String authEndpoint = discoveryClient.resolve(issuer).authorization();
         StringBuilder url = new StringBuilder(authEndpoint);
-        // 保留 query string 模式（URL 可能自带 ?）
         if (!authEndpoint.contains("?")) url.append('?');
         else url.append('&');
         boolean first = true;
@@ -147,12 +170,21 @@ public class OIDCService {
      * @return OidcLoginResult 含 tenantId / email / sessionToken / returnTo
      */
     public OidcLoginResult handleCallback(String code, String state, String nonce) {
+        // 兼容旧 API：tenant 路由由前端传 /v1/auth/oidc/callback?tenant= 决定
+        return handleCallback(code, state, nonce, null);
+    }
+
+    public OidcLoginResult handleCallback(String code, String state, String nonce, String tenantHint) {
         if (!config.isEnabled()) {
             throw new IllegalStateException("OIDC is disabled");
         }
-        // 1) state 校验：拆 raw + returnTo
+        // 1) state 校验：拆 raw + returnTo + tenantId
         String rawState = extractRawState(state);
         String returnTo = extractReturnTo(state);
+        String stateTenant = extractTenantFromState(state);
+        // 优先用 state 内嵌的 tenant（防 session 切换攻击），其次用 hint
+        String effectiveTenant = stateTenant != null && !stateTenant.isBlank()
+                ? stateTenant : tenantHint;
         if (rawState == null || returnTo == null) {
             throw new IllegalArgumentException("invalid state format");
         }
@@ -161,15 +193,16 @@ public class OIDCService {
             throw new IllegalArgumentException("state invalid or replayed");
         }
 
-        // 2) token exchange
-        OidcTokenResponse token = exchangeCode(code);
+        // 2) token exchange（按 effective tenant 选 issuer）
+        String tokenIssuer = resolveIssuer(effectiveTenant);
+        OidcTokenResponse token = exchangeCode(code, tokenIssuer);
         if (token.error() != null) {
             throw new IllegalArgumentException("token exchange failed: "
                     + token.error() + " " + token.errorDescription());
         }
 
-        // 3) claims 校验（不含签名，round 3 加 RS256 + JWKS）
-        verifyIdTokenClaims(token.idToken());
+        // 3) claims 校验（用对应 tenant 的 issuer/client）
+        verifyIdTokenClaims(token.idToken(), tokenIssuer);
 
         // 4) userinfo
         OidcUserInfo userInfo = fetchUserInfo(token.accessToken());
@@ -192,15 +225,15 @@ public class OIDCService {
 
     // ============================= token exchange =============================
 
-    private OidcTokenResponse exchangeCode(String codeCode) {
-        String issuer = config.getIssuer();
+    private OidcTokenResponse exchangeCode(String codeCode, String issuer) {
         String tokenUrl = discoveryClient.resolve(issuer).token();
         String redirectUri = redirectUri(issuer);
+        OIDCConfig.TenantOverride override = currentOverride(issuer);
         Map<String, String> form = new LinkedHashMap<>();
         form.put("grant_type", "authorization_code");
         form.put("code", codeCode);
-        form.put("client_id", config.getClientId());
-        form.put("client_secret", config.getClientSecret());
+        form.put("client_id", override != null ? override.getClientId() : config.getClientId());
+        form.put("client_secret", override != null ? override.getClientSecret() : config.getClientSecret());
         form.put("redirect_uri", redirectUri);
 
         StringBuilder body = new StringBuilder();
@@ -256,7 +289,7 @@ public class OIDCService {
     // ============================= ID token 验证（签名 + claims）=============================
 
     /** round 3：RS256 签名验证 + iss / aud / exp 校验。 */
-    private void verifyIdTokenClaims(String idToken) {
+    private void verifyIdTokenClaims(String idToken, String issuer) {
         if (idToken == null || idToken.isBlank()) {
             throw new IllegalArgumentException("id_token missing");
         }
@@ -272,7 +305,6 @@ public class OIDCService {
         String kid = (String) header.get("kid");
         if (!"RS256".equals(alg)) {
             throw new IllegalArgumentException("unsupported alg: " + alg + " (only RS256)");
-            // 拒掉 'none' 与弱算法；其他算法下轮加
         }
         if (kid == null || kid.isBlank()) {
             throw new IllegalArgumentException("id_token missing kid");
@@ -280,7 +312,7 @@ public class OIDCService {
 
         // 2) 签名验证
         try {
-            PublicKey publicKey = jwksClient.getPublicKey(config.getIssuer(), kid);
+            PublicKey publicKey = jwksClient.getPublicKey(issuer, kid);
             Signature verifier = Signature.getInstance("SHA256withRSA");
             verifier.initVerify(publicKey);
             // signed input = header.payload（两段原始 base64url，不带 padding 也不解码）
@@ -398,15 +430,58 @@ public class OIDCService {
 
     public static String extractReturnTo(String packedState) {
         if (packedState == null) return null;
-        int idx = packedState.indexOf('.');
-        if (idx < 0 || idx == packedState.length() - 1) return null;
+        // state 格式: raw.returnTo.tenant（multi-tenant round 5+）
+        // 取第二段（index 1）作为 returnTo
+        String[] parts = packedState.split("\\.", -1);
+        if (parts.length < 2) return null;
         try {
             return new String(
-                    Base64.getUrlDecoder().decode(packedState.substring(idx + 1)),
+                    Base64.getUrlDecoder().decode(parts[1]),
                     StandardCharsets.UTF_8);
         } catch (IllegalArgumentException ex) {
             return null;
         }
+    }
+
+    /**
+     * 从 packed state 拆出 tenantId（state 格式: raw.returnTo.tenantId 全部 base64url）。
+     * 单租户模式无第三段 → 返回 null（caller 走全局）。
+     */
+    public static String extractTenantFromState(String packedState) {
+        if (packedState == null) return null;
+        String[] parts = packedState.split("\\.");
+        if (parts.length < 3) return null;
+        try {
+            String t = new String(
+                    Base64.getUrlDecoder().decode(parts[2]),
+                    StandardCharsets.UTF_8);
+            return t.isEmpty() ? null : t;
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    /** 给定 tenantId → 用其 issuer；未配 tenant override → 全局 issuer。 */
+    String resolveIssuer(String tenantId) {
+        if (tenantId != null) {
+            OIDCConfig.TenantOverride ov = config.tenantOverride(tenantId);
+            if (ov != null && ov.getIssuer() != null && !ov.getIssuer().isBlank()) {
+                return ov.getIssuer();
+            }
+        }
+        return config.getIssuer();
+    }
+
+    /** 给定已解析的 issuer → 反查对应 tenant override（null = 全局）。 */
+    OIDCConfig.TenantOverride currentOverride(String issuer) {
+        if (config.getTenants() != null) {
+            for (var e : config.getTenants().entrySet()) {
+                if (e.getValue() != null && issuer.equals(e.getValue().getIssuer())) {
+                    return e.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     public record AuthRequest(String authorizationUrl, String state, String nonce) {}

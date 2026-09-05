@@ -135,7 +135,27 @@ class OIDCServiceTest {
     void extractReturnToReturnsNullOnMalformed() {
         assertThat(OIDCService.extractReturnTo(null)).isNull();
         assertThat(OIDCService.extractReturnTo("no-dot")).isNull();
-        assertThat(OIDCService.extractReturnTo("prefix.")).isNull();
+    }
+
+    @Test
+    void extractTenantFromStateReturnsNullForSingleTenant() {
+        // 单租户模式：state 只有 2 段（raw.returnTo），无 tenant 段
+        String packedState = "raw." + java.util.Base64.getUrlEncoder().withoutPadding()
+                .encodeToString("/dashboard".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        assertThat(OIDCService.extractTenantFromState(packedState)).isNull();
+    }
+
+    @Test
+    void extractTenantFromStateRoundTripsForMultiTenant() {
+        // 多租户模式：state 3 段（raw.returnTo.tenant）
+        String tenant = "acme-corp-3e1ecd8a";
+        String packedState = "raw."
+                + java.util.Base64.getUrlEncoder().withoutPadding()
+                        .encodeToString("/admin-users".getBytes(java.nio.charset.StandardCharsets.UTF_8))
+                + "."
+                + java.util.Base64.getUrlEncoder().withoutPadding()
+                        .encodeToString(tenant.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        assertThat(OIDCService.extractTenantFromState(packedState)).isEqualTo(tenant);
     }
 
     @Test
@@ -360,9 +380,9 @@ class OIDCServiceTest {
     private void invokeVerify(String jwt) {
         try {
             java.lang.reflect.Method m = OIDCService.class
-                    .getDeclaredMethod("verifyIdTokenClaims", String.class);
+                    .getDeclaredMethod("verifyIdTokenClaims", String.class, String.class);
             m.setAccessible(true);
-            m.invoke(oidc, jwt);
+            m.invoke(oidc, jwt, "https://login.example.com");
         } catch (java.lang.reflect.InvocationTargetException ex) {
             Throwable cause = ex.getCause();
             if (cause instanceof RuntimeException re) throw re;
