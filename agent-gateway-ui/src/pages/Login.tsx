@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Button, Form, Input, Space, Spin, message } from 'antd';
 import { LockOutlined, UserOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { login, oidcStatus, oidcStartLogin, hasAdminToken } from '../lib/api/auth';
+import { getTenant } from '../lib/request';
 import { PageHeader } from '../components/framework/PageHeader';
 import type { OidcStatus } from '../lib/api/auth';
 
@@ -43,7 +44,8 @@ export function Login() {
   const onSsoLogin = async () => {
     setSsoStarting(true);
     try {
-      const r = await oidcStartLogin('/admin-users');
+      // 多租户 SaaS：把当前租户传给 backend，命中 tenants.<tenantId> override
+      const r = await oidcStartLogin('/admin-users', getTenant() || undefined);
       // 整页跳到 IdP 登录页；callback 端 set localStorage + 跳 /admin-users
       window.location.href = r.authorizationUrl;
     } catch (e) {

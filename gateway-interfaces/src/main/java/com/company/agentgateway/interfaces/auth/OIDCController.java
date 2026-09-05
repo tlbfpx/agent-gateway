@@ -34,15 +34,17 @@ public class OIDCController {
 
     @GetMapping("/login")
     public Map<String, Object> login(
-            @RequestParam(value = "returnTo", required = false) String returnTo) {
+            @RequestParam(value = "returnTo", required = false) String returnTo,
+            @RequestParam(value = "tenant", required = false) String tenant) {
         ensureEnabled();
         try {
-            OIDCService.AuthRequest req = oidcService.buildAuthorizationRequest(returnTo);
+            OIDCService.AuthRequest req = oidcService.buildAuthorizationRequest(returnTo, tenant);
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("authorizationUrl", req.authorizationUrl());
             out.put("state", req.state());
             out.put("nonce", req.nonce());
             out.put("returnTo", returnTo != null ? returnTo : "/");
+            out.put("tenant", tenant);
             return out;
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -61,11 +63,12 @@ public class OIDCController {
             @RequestParam("state") String state,
             @RequestParam(value = "nonce", required = false) String nonce,
             @RequestParam(value = "redirect", defaultValue = "true") boolean redirect,
+            @RequestParam(value = "tenant", required = false) String tenant,
             HttpServletResponse httpResp) throws IOException {
         ensureEnabled();
         OIDCService.OidcLoginResult r;
         try {
-            r = oidcService.handleCallback(code, state, nonce);
+            r = oidcService.handleCallback(code, state, nonce, tenant);
         } catch (IllegalArgumentException ex) {
             if (redirect) {
                 String safeMsg = URLEncoder.encode(ex.getMessage(), StandardCharsets.UTF_8);

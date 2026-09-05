@@ -84,8 +84,11 @@ export interface OidcLoginResponse {
   returnTo: string;
 }
 
-export const oidcStartLogin = (returnTo = '/') =>
-  fetch(`/v1/auth/oidc/login?returnTo=${encodeURIComponent(returnTo)}`)
+export const oidcStartLogin = (returnTo = '/', tenant?: string) => {
+  const params = new URLSearchParams();
+  params.set('returnTo', returnTo);
+  if (tenant) params.set('tenant', tenant);
+  return fetch(`/v1/auth/oidc/login?${params.toString()}`)
       .then(async (r) => {
         if (!r.ok) {
           const body = await r.text();
@@ -93,6 +96,7 @@ export const oidcStartLogin = (returnTo = '/') =>
         }
         return (await r.json()) as OidcLoginResponse;
       });
+}
 
 export const getMe = (token: string) =>
   fetch('/v1/admin/auth/me', {
