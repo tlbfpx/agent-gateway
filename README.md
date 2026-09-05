@@ -1,17 +1,44 @@
 # Agent Gateway
 
-公司级 Agent 通用网关：统一会话入口，SSE 流式对话，A2A 协议调用远程 Agent（Nacos 注册发现）。
+> AI Agent 调用的统一网关：路由、限流、计费、审计、RBAC、缓存。
+>
+> 一行 Helm 起网关，5 分钟接企业 SSO。Demo 现成 · 自助注册 30 秒 · 三档定价直白透明。
 
-技术栈：**Spring Boot 4.0 · Spring AI Alibaba 2.0.0-M1 · Nacos A2A · MiniMax/GLM/DeepSeek 多模型**
+| | |
+|---|---|
+| 版本 | [v0.2.0](https://github.com/tlbfpx/agent-gateway/releases/tag/v0.2.0) |
+| License | Apache-2.0 |
+| 技术栈 | Spring Boot 4.0 · Spring AI Alibaba · MiniMax / GLM / DeepSeek · Nacos A2A |
+| 路由 | 41 个管理页面 + 35+ 后端 REST 端点 |
+| 安全 | 多租户越权防护 + 审计 SOC2 + JWT RS256 + bcrypt |
+| 部署 | 本地 / Docker / Helm / SaaS / 私有化 |
+
+---
 
 ## 快速开始
+
+**1. 在线试用**（最快，零本地安装）
+
+  - 🚀 [一键试用 Demo](http://localhost:5173/demo) — 24h 自动清理
+  - 📝 [自助注册](http://localhost:5173/signup) — 30 秒开通独立租户
+  - 💰 [查看定价](http://localhost:5173/pricing) — Community / Team / Enterprise 三档
+
+**2. 本地启动**
 
     # 后端（8080）
     MINIMAX_API_KEY=sk-... mvn -pl gateway-bootstrap spring-boot:run
     # 前端（5173，代理 /v1 → 8080）
     cd agent-gateway-ui && npm install && npm run dev
 
-首次使用：打开 http://localhost:5173 → 顶栏「⚙ 运营」→ 签发 API Key → 填入右栏 → 「模型管理」配置模型。
+打开 http://localhost:5173 → 按 `/getting-started` 5 步清单走完，10 分钟解锁全部能力。
+
+**3. 生产部署**
+
+    # Kubernetes 一键（Helm chart，含 Ingress + HPA + TLS）
+    helm install gateway ./deploy/helm/agent-gateway \
+      --values ./deploy/helm/agent-gateway/values.yaml
+
+详细见 [`deploy/helm/agent-gateway/README.md`](deploy/helm/agent-gateway/README.md)。
 
 ## 功能总览
 
