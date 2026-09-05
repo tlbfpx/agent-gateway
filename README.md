@@ -28,15 +28,27 @@
 **安全与治理**
 - API Key 双通道（签发/吊销持久化 `data/api-keys.json`）· Key 过期时间（`expiresAt`，过期自动 401）· 模型白名单 · Agent 级 + **Skill 级 RBAC**
 - 限流五维度（租户/用户/Key QPS + Agent 并发 + token 日预算）→ 429
+- **多租户隔离加固**：`TenantEnforcementFilter` 强制服务端校验 X-Tenant-Id 越权 → 403 GW-1003（防止伪造 header 跨租户读）
 - 运营台独立管理凭据 `X-Admin-Token`（`gateway.security.admin-token`，默认空=关闭，与用户 API Key 分离）
-- 审计日志（认证/授权/限流/Agent 调用）append-only + 查询端点
+- 审计日志（认证/授权/限流/Agent 调用）append-only + 查询端点 + **CSV 导出**（SOC2/ISO27001 合规，`/v1/admin/audit/logs/export.csv`）
 - Webhook 事件推送（HMAC 签名 + 指数退避重试 + 死信队列）
 
-**可观测**：Micrometer 指标（`/actuator/metrics`）· OpenAPI 3.0（`/v1/openapi.json`）· readiness/liveness 分离（`/v1/ready` `/v1/health`）
+**企业 SSO**：[`docs/operators/OIDC.md`](docs/operators/OIDC.md) — OIDC Authorization Code Flow，支持 Azure AD / Okta / Auth0 / Google Workspace；Discovery 自动发现端点（5 分钟接入）
+- 登录入口：`/login` 页显示「用 Enterprise SSO 登录」按钮
+- 自动 provisioning：首次 SSO 登录按 email 自动建 AdminUser + bcrypt 防密码登录
+
+**Demo / 自助注册**
+- `/demo` 一键试用，24h 自动清理，零注册成本
+- `/signup` 30 秒自助开通（email/password/companyName 三字段）
+- `/settings` 首登引导「一键签发首把 API Key」
+
+**可观测**：Micrometer 指标（`/actuator/metrics`）· OpenAPI 3.0（`/v1/openapi.json`）· readiness/liveness 分离（`/v1/ready` `/v1/health`）· **运维 status 页面**（`/status`，公开 `GET /status.json`）
 
 **预算治理**：预算 80%/100% 两级告警（AlertCenter + Webhook 推送，去重）· 超限动作可配 BLOCK（默认 429）/ DOWNGRADE（降级到 fallbackModel 继续服务）
 
-**运营**：模型管理 · Webhook 订阅 · 审计查询 · 配置版本/回滚/diff（全部前端可视化）
+**部署**：[`deploy/helm/agent-gateway/`](deploy/helm/agent-gateway) — Helm chart 一键部署到 k8s（Deployment + Service + Ingress + HPA + Secret，helm lint 0 错）
+
+**运营**：模型管理 · Webhook 订阅 · 审计查询 · 配置版本/回滚/diff（全部前端可视化）· **Changelog 页面**（`/changelog`，按 release 倒序）
 
 ## 运维
 
@@ -49,6 +61,7 @@
 > ⚠️ **生产部署前必读**：[`docs/known-limitations.md`](docs/known-limitations.md) —— 内存态存储范围 + 插件隔离边界 + 长期搁置项的当前状态
 
 - **`docs/known-limitations.md`**（生产部署前必读）
+- **`docs/operators/OIDC.md`**（Azure AD / Okta / Auth0 / Google 5 分钟接入指南）
 - 设计 spec：`docs/superpowers/specs/2026-08-12-agent-gateway-design.md`（§1-29）
-- 变更史：`openspec/changes/`（OpenSpec 四件套）
+- 变更史：`openspec/changes/`（OpenSpec 四件套） + **`CHANGELOG.md`**（前端 `/changelog` 渲染）
 - 协同规范：`AGENTS.md`

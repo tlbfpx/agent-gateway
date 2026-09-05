@@ -118,6 +118,18 @@ demo:
   ttl: "24h"
   cleanupInterval: "1h"
 
+# OIDC SSO（spec 2026-09-05 §sso-oidc）—— prod 默认关闭；企业客户打开
+# Discovery 自动从 {issuer}/.well-known/openid-configuration 拉端点（无需手填）
+# 启用后 /v1/auth/oidc/login 返回 IdP 跳转 URL；callback 处理 token exchange + JWKS 验签
+# 5 分钟接入指南：docs/operators/OIDC.md（Azure AD / Okta / Auth0 / Google）
+oidc:
+  enabled: false
+  issuer: ""
+  clientId: ""
+  clientSecret: ""      # 强烈建议从 secrets 注入；不要在 values.yaml 写明文
+  scopes: "openid,email,profile"
+  defaultRedirectReturnTo: "/"
+
 # ---------- 探针 ----------
 probes:
   liveness:

@@ -68,6 +68,12 @@ data:
         enabled: {{ .Values.demo.enabled }}
         ttl: {{ .Values.demo.ttl | quote }}
         cleanup-interval: {{ .Values.demo.cleanupInterval | quote }}
+      oidc:
+        enabled: {{ .Values.oidc.enabled }}
+        issuer: {{ .Values.oidc.issuer | quote }}
+        # client-id / client-secret 通过 secretKeyRef 注入（spec §sso-oidc §6.3）
+        scopes: {{ .Values.oidc.scopes | quote }}
+        default-redirect-return-to: {{ .Values.oidc.defaultRedirectReturnTo | quote }}
 
     observability:
       storage:
