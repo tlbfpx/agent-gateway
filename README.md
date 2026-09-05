@@ -77,6 +77,52 @@
 
 **运营**：模型管理 · Webhook 订阅 · 审计查询 · 配置版本/回滚/diff（全部前端可视化）· **Changelog 页面**（`/changelog`，按 release 倒序）
 
+## 架构
+
+```
+            ┌─────────────────────┐
+   HTTPS    │   React / Vite UI    │  /v1/* proxy
+   ────────►│   (35+ admin pages)  │──────────┐
+            └──────────┬──────────┘          │
+                       │  /v1/openapi.json   │
+                       │  /v1/auth/*         │
+                       │  /v1/demo/*         │
+                       ▼                     ▼
+            ┌──────────────────────────────────────┐
+            │   Spring Boot 4 Gateway (8080)       │
+            │   ┌──────────────┐  ┌──────────────┐   │
+            │   │  RbacFilter   │  │ TenantEnflt │   │
+            │   │  (perAuth)    │  │ (perTenant) │   │
+            │   └──────────────┘  └──────────────┘   │
+            │   ┌──────────────┐  ┌──────────────┐   │
+            │   │ AdminToken   │  │  RateLimit   │   │
+            │   │ Filter       │  │  (5 维)      │   │
+            │   └──────────────┘  └──────────────┘   │
+            │   ┌──────────────┐  ┌──────────────┐   │
+            │   │  OIDC SSO    │  │  Demo /      │   │
+            │   │  + Discovery │  │  Signup      │   │
+            │   └──────────────┘  └──────────────┘   │
+            └────────┬─────────────────────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+   ┌─────────┐  ┌─────────┐  ┌─────────┐
+   │ Postgres│  │ Model   │  │ Webhook │
+   │ (audit  │  │ LLM     │  │   HMAC  │
+   │ metrics)│  │ Gateway │  │   + DLQ │
+   └─────────┘  └─────────┘  └─────────┘
+```
+
+模块边界（spec §GW-DDD-001）：
+- **domain**：纯 Java POJO，无 Spring 注解
+- **application**：用例编排，依赖 domain port
+- **infra-security / infra-persistence / infra-observability / infra-llm**：port 实现
+- **interfaces**：REST 控制器 + Security Filter（gateway-interfaces 依赖 application + infra）
+- **bootstrap**：Spring Boot 入口 + Flyway + ConfigMap
+- **agent-gateway-ui**：独立 Vite SPA（代理 /v1 → 8080）
+
+每个模块单向依赖 `domain`，由 `verify.sh` 的 dependency:tree 负向断言守住。
+
 ## 运维
 
     ./verify.sh              # 一键门禁：编译+全模块测试+依赖方向断言
