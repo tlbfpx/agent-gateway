@@ -3,6 +3,7 @@ import { Alert, Button, Card, Space, Spin, Tag, Typography, message } from 'antd
 import { ThunderboltOutlined, LoginOutlined, GiftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { demoApi, persistDemoSession, type DemoStatus } from '../lib/api/demo';
+import { useT } from '../lib/i18n';
 import { PageHeader } from '../components/framework/PageHeader';
 import { PageLoading } from '../components/framework/PageLoading';
 

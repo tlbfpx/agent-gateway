@@ -163,6 +163,28 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'settings.keyNote':   { zh: '完整值已写入 localStorage.agent-gateway.apiKey · 下次启动自动带入',
                           en: 'Full value in localStorage.agent-gateway.apiKey, auto-loaded on next start' },
   'settings.refreshStatus': { zh: '我已有 Key · 刷新状态', en: 'I have a key · refresh status' },
+
+  // ---- /demo ----
+  'demo.subtitle':   { zh: 'AI Agent 调用的统一网关：路由、限流、计费、审计', en: 'Unified gateway for AI Agents: routing, rate limits, billing, audit' },
+  'demo.ctaTitle':   { zh: '试用 Demo · 无需注册', en: 'Try the Demo · no signup' },
+  'demo.ctaBody':    { zh: '点击下方按钮，本系统会为你创建一个独立的 demo 租户（独立数据隔离），包含：',
+                       en: 'Click below to create an isolated demo tenant (separate data) with:' },
+  'demo.ctaItem1':   { zh: 'API Key（24h 有效期）', en: 'API Key (24h validity)' },
+  'demo.ctaItem2':   { zh: 'Admin 账号（OWNER 角色，可访问管理端）', en: 'Admin account (OWNER role, full admin access)' },
+  'demo.ctaItem3':   { zh: '预置的 echo-agent 和示例模型', en: 'Pre-installed echo-agent & sample models' },
+  'demo.ctaWarn':    { zh: '注意', en: 'Note' },
+  'demo.ctaWarnBody':{ zh: 'Demo 数据 24 小时后自动清理；正式使用请通过设置页绑定你的真实账号。',
+                       en: 'Demo data is auto-cleaned after 24h. For production, sign up and bind your real account in Settings.' },
+  'demo.creating':   { zh: '创建中…', en: 'Creating…' },
+  'demo.tryBtn':      { zh: '一键试用 Demo', en: 'Try the Demo' },
+  'demo.disabled':    { zh: 'Demo 模式未启用', en: 'Demo mode disabled' },
+  'demo.disabledDesc':{ zh: '请联系管理员开启 GATEWAY_DEMO_ENABLED 环境变量；或直接登录。',
+                         en: 'Ask your admin to enable GATEWAY_DEMO_ENABLED, or sign in directly.' },
+  'demo.haveAccount': { zh: '已有账号？', en: 'Already have an account?' },
+  'demo.haveAccountDesc': { zh: '在「设置」页填入你的 API Key + 租户 ID + Admin Token 即可登录管理端。',
+                            en: 'Fill API Key + tenant ID + Admin Token in Settings, then sign in.' },
+  'demo.adminLogin':  { zh: 'Admin 登录', en: 'Admin login' },
+  'demo.signupBtn':   { zh: '注册正式账号', en: 'Sign up' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
