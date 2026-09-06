@@ -59,6 +59,11 @@ public class InfoController {
                 oidcService.isEnabled() && oidcService.tenantOverrideCount() > 0);
         out.put("features", features);
 
+        // spec §info-endpoint round 37 — 集成方自动跟踪更新用
+        out.put("analyticsEnabled", false);        // 占位：可读 env 启用
+        out.put("changelogUrl", "/v1/changelog");
+        out.put("githubUrl", "https://github.com/tlbfpx/agent-gateway");
+
         return out;
     }
 
