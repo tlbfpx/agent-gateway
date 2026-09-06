@@ -1,4 +1,4 @@
-import { Space, Typography, Button, Card, Row, Col, Tag, Space as ASpace } from 'antd';
+import { Space, Typography, Button, Card, Row, Col, Tag } from 'antd';
 import {
   RocketOutlined,
   GiftOutlined,
@@ -41,7 +41,7 @@ export function Welcome() {
               'Routing, rate limits, billing, audit, RBAC, caching. Try Demo · self-serve signup in 30s · OIDC SSO in 5 min.'
             )}
           </Paragraph>
-          <ASpace size="middle" wrap>
+          <Space size="middle" wrap>
             <Link to="/demo">
               <Button type="primary" size="large" icon={<GiftOutlined />}>
                 {tr('一键试用 Demo', 'Try the Demo')}
@@ -55,14 +55,14 @@ export function Welcome() {
                 {tr('查看定价', 'View pricing')}
               </Button>
             </Link>
-          </ASpace>
-          <ASpace size="small" wrap>
+          </Space>
+          <Space size="small" wrap>
             <Tag color="blue">v0.3.0</Tag>
             <Tag color="green">Apache-2.0</Tag>
             <Tag>{tr('41 个管理页面', '41 admin pages')}</Tag>
             <Tag>{tr('30+ 单测', '30+ tests')}</Tag>
             <Tag color="purple">TS 0 错</Tag>
-          </ASpace>
+          </Space>
         </Space>
       </Card>
 
@@ -87,12 +87,12 @@ export function Welcome() {
 
       {/* Trust badges */}
       <Card size="small">
-        <ASpace size="large" wrap>
+        <Space size="large" wrap>
           <span><Tag color="blue">SOC2</Tag>{tr('审计导出', 'Audit export')}</span>
           <span><Tag color="green">TLS 1.2+</Tag>{tr('传输加密', 'Transport encryption')}</span>
           <span><Tag color="purple">RBAC</Tag>{tr('Agent / Skill 细粒度', 'Per-Agent / Per-Skill')}</span>
           <span><Tag color="orange">OIDC</Tag>{tr('多租户 SaaS', 'Multi-tenant SaaS')}</span>
-        </ASpace>
+        </Space>
       </Card>
 
       {/* Final CTA */}
@@ -101,7 +101,7 @@ export function Welcome() {
           <Title level={4} style={{ margin: 0 }}>
             {tr('30 秒开通租户，10 分钟上手全部能力', '30s to sign up, 10 min to learn everything')}
           </Title>
-          <ASpace size="middle" wrap style={{ justifyContent: 'center' }}>
+          <Space size="middle" wrap style={{ justifyContent: 'center' }}>
             <Link to="/demo">
               <Button type="primary" size="large" icon={<RocketOutlined />}>
                 {tr('试用 Demo', 'Try Demo')}
@@ -115,7 +115,7 @@ export function Welcome() {
                 {tr('联系销售', 'Contact sales')}
               </Button>
             </Link>
-          </ASpace>
+          </Space>
         </Space>
       </Card>
     </Space>
