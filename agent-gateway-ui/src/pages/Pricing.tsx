@@ -2,6 +2,7 @@ import { Card, Space, Tag, Typography, Button, Divider, Row, Col } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -134,30 +135,31 @@ function GroupHeader({ label }: { label: string }) {
  */
 export function Pricing() {
   const groups = Array.from(new Set(FEATURES.map((f) => f.group)));
+  const t = useT();
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <PageHeader
         eyebrow="Pricing"
-        title="选择适合你的版本"
-        sub="核心功能全版本可用，按规模与合规要求选档"
+        title={t('pricing.title')}
+        sub={t('pricing.subtitle')}
       />
 
       {/* 三档定价卡 */}
       <Row gutter={[16, 16]}>
-        {TIERS.map((t) => (
-          <Col xs={24} md={8} key={t.key}>
+        {TIERS.map((t2) => (
+          <Col xs={24} md={8} key={t2.key}>
             <Card
-              data-testid={`pricing-tier-${t.key}`}
+              data-testid={`pricing-tier-${t2.key}`}
               style={{
-                borderColor: t.highlight ? '#1677ff' : undefined,
-                borderWidth: t.highlight ? 2 : 1,
+                borderColor: t2.highlight ? '#1677ff' : undefined,
+                borderWidth: t2.highlight ? 2 : 1,
               }}
             >
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                  <Text strong style={{ fontSize: 18 }}>{t.name}</Text>
-                  {t.highlight && <Tag color="blue">推荐</Tag>}
+                  <Text strong style={{ fontSize: 18 }}>{t2.name}</Text>
+                  {t2.highlight && <Tag color="blue">{t('pricing.recommended')}</Tag>}
                 </Space>
                 <Space align="baseline">
                   <Text style={{ fontSize: 32, fontWeight: 700 }}>{t.price}</Text>
@@ -229,9 +231,9 @@ export function Pricing() {
       <Divider style={{ margin: '8px 0' }} />
 
       <Space style={{ width: '100%', justifyContent: 'center' }} size="large">
-        <Link to="/demo"><Button type="primary" size="large">先试用 Demo</Button></Link>
-        <Link to="/signup"><Button size="large">直接注册</Button></Link>
-        <Link to="/changelog"><Button size="large" type="text">v0.2.0 更新日志</Button></Link>
+        <Link to="/demo"><Button type="primary" size="large">{t('pricing.tryFirst')}</Button></Link>
+        <Link to="/signup"><Button size="large">{t('pricing.signupNow')}</Button></Link>
+        <Link to="/changelog"><Button size="large" type="text">{t('pricing.v020Changelog')}</Button></Link>
       </Space>
     </Space>
   );
