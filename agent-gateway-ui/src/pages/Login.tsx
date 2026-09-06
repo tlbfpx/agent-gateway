@@ -3,6 +3,7 @@ import { Alert, Button, Form, Input, Space, Spin, message } from 'antd';
 import { LockOutlined, UserOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { login, oidcStatus, oidcStartLogin, hasAdminToken } from '../lib/api/auth';
 import { getTenant } from '../lib/request';
+import { useT } from '../lib/i18n';
 import { PageHeader } from '../components/framework/PageHeader';
 import type { OidcStatus } from '../lib/api/auth';
 
@@ -15,6 +16,7 @@ import type { OidcStatus } from '../lib/api/auth';
  *    启用则显示「用企业账号登录」按钮 → /v1/auth/oidc/login 拿 authorizationUrl → location.href
  */
 export function Login() {
+  const t = useT();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [ssoStarting, setSsoStarting] = useState(false);
@@ -57,10 +59,10 @@ export function Login() {
   if (hasAdminToken()) {
     return (
       <>
-        <PageHeader eyebrow="权限" title="Admin 登录" sub="已登录" />
+        <PageHeader eyebrow={`权限 · ${t('login.title')}`} title={t('login.title')} sub={t('login.loggedIn')} />
         <Alert
           type="success" showIcon
-          message="已登录 · 浏览器已保存 Admin Token"
+          message={t('login.loggedInMsg')}
           description="可直接访问 /admin-users /teams /prompts /datasets /feedback 等管理端"
         />
       </>
@@ -70,9 +72,9 @@ export function Login() {
   return (
     <>
       <PageHeader
-        eyebrow="权限"
-        title="Admin 登录"
-        sub="多 Admin 账号 + PBKDF2 密码哈希 + RBAC"
+        eyebrow={`权限 · ${t('login.title')}`}
+        title={t('login.title')}
+        sub={t('login.subtitle')}
       />
 
       <div style={{ maxWidth: 420 }}>
@@ -95,13 +97,13 @@ export function Login() {
               onClick={onSsoLogin}
               data-testid="sso-login-btn"
             >
-              {ssoStarting ? '正在跳转企业登录…' : `用 ${oidc.displayName ?? '企业账号'} 登录`}
+              {ssoStarting ? t('login.ssoStarting') : t('login.ssoCta').replace('{name}', oidc.displayName ?? t('login.ssoDefault'))}
             </Button>
             <Alert
               type="info"
               showIcon
               style={{ marginTop: 12 }}
-              message="SSO 走 OAuth2 Authorization Code Flow，浏览器重定向到企业 IdP 登录"
+              message={t('login.ssoHint')}
             />
           </div>
         )}
@@ -114,22 +116,22 @@ export function Login() {
 
         <Form form={form} layout="vertical" onFinish={onSubmit}>
           <Form.Item
-            name="tenantId" label="租户" initialValue="au" rules={[{ required: true }]}
+            name="tenantId" label={t('login.tenant')} initialValue="au" rules={[{ required: true }]}
           >
             <Input prefix={<UserOutlined />} placeholder="au" />
           </Form.Item>
           <Form.Item
-            name="email" label="邮箱" rules={[
-              { required: true, message: '请输入邮箱' },
-              { type: 'email', message: '邮箱格式不正确' },
+            name="email" label={t('login.email')} rules={[
+              { required: true, message: t('login.emailRequired') },
+              { type: 'email', message: t('login.emailInvalid') },
             ]}
           >
             <Input prefix={<UserOutlined />} placeholder="alice@example.com" />
           </Form.Item>
           <Form.Item
-            name="password" label="密码" rules={[
-              { required: true, message: '请输入密码' },
-              { min: 8, message: '密码至少 8 位' },
+            name="password" label={t('login.password')} rules={[
+              { required: true, message: t('login.passwordRequired') },
+              { min: 8, message: t('login.passwordMin') },
             ]}
           >
             <Input.Password prefix={<LockOutlined />} placeholder="********" />
@@ -137,7 +139,7 @@ export function Login() {
           <Form.Item>
             <Space>
               <Button type="primary" htmlType="submit" loading={loading}>
-                密码登录
+                {t('login.passwordLogin')}
               </Button>
             </Space>
           </Form.Item>

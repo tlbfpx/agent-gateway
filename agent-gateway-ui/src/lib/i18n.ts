@@ -185,6 +185,29 @@ const STRINGS: Record<string, Record<Lang, string>> = {
                             en: 'Fill API Key + tenant ID + Admin Token in Settings, then sign in.' },
   'demo.adminLogin':  { zh: 'Admin 登录', en: 'Admin login' },
   'demo.signupBtn':   { zh: '注册正式账号', en: 'Sign up' },
+
+  // ---- /login ----
+  'login.title':          { zh: 'Admin 登录', en: 'Admin login' },
+  'login.subtitle':       { zh: '多 Admin 账号 + PBKDF2 密码哈希 + RBAC', en: 'Multi-Admin accounts + PBKDF2 hashing + RBAC' },
+  'login.loggedIn':       { zh: '已登录', en: 'Logged in' },
+  'login.loggedInMsg':    { zh: '已登录 · 浏览器已保存 Admin Token', en: 'Logged in · Admin token saved in this browser' },
+  'login.loggedInDesc':   { zh: '可直接访问 /admin-users /teams /prompts /datasets /feedback 等管理端', en: 'Visit /admin-users /teams /prompts /datasets /feedback and more' },
+  'login.ssoStarting':    { zh: '正在跳转企业登录…', en: 'Redirecting to SSO…' },
+  'login.ssoCta':         { zh: '用 {name} 登录', en: 'Sign in with {name}' },
+  'login.ssoDefault':     { zh: '企业账号', en: 'Enterprise SSO' },
+  'login.ssoHint':        { zh: 'SSO 走 OAuth2 Authorization Code Flow，浏览器重定向到企业 IdP 登录',
+                            en: 'SSO uses OAuth2 Authorization Code Flow; browser redirects to your IdP' },
+  'login.tenant':         { zh: '租户', en: 'Tenant' },
+  'login.email':          { zh: '邮箱', en: 'Email' },
+  'login.emailRequired':  { zh: '请输入邮箱', en: 'Email required' },
+  'login.emailInvalid':   { zh: '邮箱格式不正确', en: 'Invalid email format' },
+  'login.password':       { zh: '密码', en: 'Password' },
+  'login.passwordRequired':{ zh: '请输入密码', en: 'Password required' },
+  'login.passwordMin':    { zh: '密码至少 8 位', en: 'Password must be at least 8 chars' },
+  'login.passwordLogin':  { zh: '密码登录', en: 'Sign in' },
+  'login.firstDeploy':    { zh: '首次部署?', en: 'First deploy?' },
+  'login.firstDeployDesc':{ zh: 'R12 #1 默认 AdminToken 兼容路径仍可用(任意非空 token 当 OWNER);本登录页启用后走真鉴权。',
+                            en: 'Default AdminToken compat path still works (any non-empty token is OWNER); this page is enforced after enabling.' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
