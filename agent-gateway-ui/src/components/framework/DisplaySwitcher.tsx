@@ -22,6 +22,17 @@ export function DisplaySwitcher() {
   const themeIcon =
     prefs.theme === 'dark' ? <MoonOutlined /> : prefs.theme === 'system' ? <DesktopOutlined /> : <SunOutlined />;
 
+  const langIcon = (() => {
+    const v = localStorage.getItem('agent-gateway.lang');
+    return v === 'en' ? <span style={{ fontSize: 12, fontWeight: 600 }}>EN</span>
+                       : <span style={{ fontSize: 12, fontWeight: 600 }}>中</span>;
+  })();
+  const switchLang = (lang: 'zh' | 'en') => {
+    localStorage.setItem('agent-gateway.lang', lang);
+    document.documentElement.setAttribute('data-lang', lang);
+    // MutationObserver 在 main.tsx 里会捕获 data-lang 变化并 setState
+  };
+
   return (
     <Popover
       trigger="click"
@@ -95,15 +106,30 @@ export function DisplaySwitcher() {
         </div>
       }
     >
-      <Tooltip title="主题 / 密度">
-        <Button
-          type="text"
-          shape="circle"
-          icon={themeIcon}
-          aria-label="主题与密度"
-          style={{ color: 'var(--text-2)' }}
-        />
-      </Tooltip>
+      <Space size={4}>
+        <Tooltip title="Language / 语言">
+          <Button
+            type="text"
+            shape="circle"
+            aria-label="切换语言"
+            onClick={() => switchLang(
+              localStorage.getItem('agent-gateway.lang') === 'en' ? 'zh' : 'en'
+            )}
+            style={{ color: 'var(--text-2)', minWidth: 32 }}
+          >
+            {langIcon}
+          </Button>
+        </Tooltip>
+        <Tooltip title="主题 / 密度">
+          <Button
+            type="text"
+            shape="circle"
+            icon={themeIcon}
+            aria-label="主题与密度"
+            style={{ color: 'var(--text-2)' }}
+          />
+        </Tooltip>
+      </Space>
     </Popover>
   );
 }
