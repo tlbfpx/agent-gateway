@@ -1,8 +1,9 @@
 import { Card, Space, Tag, Typography, Button, Divider, Row, Col } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/framework/PageHeader';
 import { useT } from '../lib/i18n';
+import { track } from '../lib/analytics';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -231,9 +232,27 @@ export function Pricing() {
       <Divider style={{ margin: '8px 0' }} />
 
       <Space style={{ width: '100%', justifyContent: 'center' }} size="large">
-        <Link to="/demo"><Button type="primary" size="large">{t('pricing.tryFirst')}</Button></Link>
-        <Link to="/signup"><Button size="large">{t('pricing.signupNow')}</Button></Link>
-        <Link to="/changelog"><Button size="large" type="text">{t('pricing.v020Changelog')}</Button></Link>
+        <Link to="/demo">
+          <Button type="primary" size="large"
+            onClick={() => import('../lib/analytics').then(({ track }) => track('pricing_cta_click', { tier: 'community' }))}
+          >
+            {t('pricing.tryFirst')}
+          </Button>
+        </Link>
+        <Link to="/signup">
+          <Button size="large"
+            onClick={() => import('../lib/analytics').then(({ track }) => track('pricing_cta_click', { tier: 'team' }))}
+          >
+            {t('pricing.signupNow')}
+          </Button>
+        </Link>
+        <Link to="/changelog">
+          <Button size="large" type="text"
+            onClick={() => import('../lib/analytics').then(({ track }) => track('pricing_cta_click', { tier: 'docs' }))}
+          >
+            {t('pricing.v020Changelog')}
+          </Button>
+        </Link>
       </Space>
     </Space>
   );

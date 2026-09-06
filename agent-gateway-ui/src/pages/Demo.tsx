@@ -44,6 +44,9 @@ export function Demo() {
       const session = await demoApi.bootstrap();
       persistDemoSession(session);
       message.success('Demo 租户已创建 · 24h 内有效');
+      // 漏斗埋点（spec §funnel-analytics）
+      const { track } = await import('../lib/analytics');
+      track('demo_bootstrap', { tenantId: session.tenantId });
       // 跳转到 dashboard；用 window.location 让所有模块重新初始化
       window.location.href = '/dashboard';
     } catch (e) {

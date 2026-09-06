@@ -21,8 +21,12 @@ export function Signup() {
       const v = await form.validateFields();
       setLoading(true);
       setError('');
+      // 漏斗埋点：开始提交（spec §funnel-analytics）
+      const { track } = await import('../lib/analytics');
+      track('signup_start', { emailDomain: v.email.split('@')[1] ?? '' });
       const r = await signupApi.signup(v.email, v.password, v.companyName);
       persistSignupSession(r);
+      track('signup_success', { tenantId: r.tenantId });
       message.success(`已创建租户 ${r.tenantId}`);
       // 跳 Settings → API Key 管理，引导用户签发首个 key
       setTimeout(() => { window.location.href = '/settings'; }, 400);
