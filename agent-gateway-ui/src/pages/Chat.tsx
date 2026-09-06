@@ -13,6 +13,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import {
   streamChat,
   type StreamCall,
@@ -56,6 +57,7 @@ const SUGGESTIONS = [
 ];
 
 export function Chat() {
+  const t = useT();
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [agents, setAgents] = useState<AgentInfo[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -409,7 +411,7 @@ export function Chat() {
                 value: m.modelId,
                 label: m.displayName || m.modelId,
               }))}
-              placeholder="选择模型"
+              placeholder={t('chat.selectModel')}
             />
             <Button icon={<PlusOutlined />} onClick={newSession} disabled={streaming}>
               新会话
@@ -631,7 +633,7 @@ export function Chat() {
                   {/* 消息操作条：assistant 显示复制/重试/分享；user 显示复制/分享 */}
                   {m.content && !streaming && (
                     <Space size={4} style={{ marginTop: 4, opacity: 0.7 }} className="msg-actions">
-                      <Tooltip title="复制">
+                      <Tooltip title={t('chat.copy')}>
                         <Button
                           type="text"
                           size="small"
@@ -640,7 +642,7 @@ export function Chat() {
                           aria-label="复制消息"
                         />
                       </Tooltip>
-                      <Tooltip title="分享">
+                      <Tooltip title={t('chat.share')}>
                         <Button
                           type="text"
                           size="small"
@@ -650,7 +652,7 @@ export function Chat() {
                         />
                       </Tooltip>
                       {m.role === 'assistant' && (
-                        <Tooltip title="重新生成">
+                        <Tooltip title={t('chat.regenerate')}>
                           <Button
                             type="text"
                             size="small"
@@ -721,7 +723,7 @@ export function Chat() {
               ref={inputRef as any}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="输入消息，Enter 发送 · Shift+Enter 换行"
+              placeholder={t('chat.inputPlaceholder')}
               autoSize={{ minRows: 1, maxRows: 6 }}
               disabled={!booted}
               onPressEnter={(e) => {

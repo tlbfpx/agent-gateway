@@ -208,6 +208,13 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'login.firstDeploy':    { zh: '首次部署?', en: 'First deploy?' },
   'login.firstDeployDesc':{ zh: 'R12 #1 默认 AdminToken 兼容路径仍可用(任意非空 token 当 OWNER);本登录页启用后走真鉴权。',
                             en: 'Default AdminToken compat path still works (any non-empty token is OWNER); this page is enforced after enabling.' },
+
+  // ---- /chat ----
+  'chat.copy':              { zh: '复制', en: 'Copy' },
+  'chat.share':             { zh: '分享', en: 'Share' },
+  'chat.regenerate':        { zh: '重新生成', en: 'Regenerate' },
+  'chat.selectModel':       { zh: '选择模型', en: 'Select model' },
+  'chat.inputPlaceholder':  { zh: '输入消息，Enter 发送 · Shift+Enter 换行', en: 'Type a message · Enter to send · Shift+Enter for newline' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
