@@ -215,6 +215,14 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'chat.regenerate':        { zh: '重新生成', en: 'Regenerate' },
   'chat.selectModel':       { zh: '选择模型', en: 'Select model' },
   'chat.inputPlaceholder':  { zh: '输入消息，Enter 发送 · Shift+Enter 换行', en: 'Type a message · Enter to send · Shift+Enter for newline' },
+
+  // ---- /agents ----
+  'agents.title':    { zh: 'Agent 注册表', en: 'Agent registry' },
+  'agents.subtitle': { zh: '共 {total} 条 · 已启用 {enabled} / {count}', en: '{total} total · {enabled} / {count} enabled' },
+
+  // ---- /audit ----
+  'audit.title':     { zh: '审计日志', en: 'Audit log' },
+  'audit.copyJson':  { zh: '复制 JSON', en: 'Copy JSON' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

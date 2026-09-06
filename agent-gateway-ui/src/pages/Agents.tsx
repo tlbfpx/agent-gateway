@@ -27,6 +27,7 @@ import {
   RobotOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import {
   listRegisteredAgents,
   registerAgent,
@@ -71,6 +72,7 @@ const SOURCE_LABEL: Record<AgentRegistration['source'], { text: string; color: s
 };
 
 export function Agents() {
+  const t = useT();
   const [data, setData] = useState<AgentRegistration[]>([]);
   const canRegister = usePermission('agent.register');
   const canEdit = usePermission('agent.edit');
@@ -347,9 +349,9 @@ export function Agents() {
   return (
     <>
       <PageHeader
-        eyebrow="Agents · Agent 注册"
-        title="Agent 注册表"
-        sub={`共 ${total} 条 · 已启用 ${data.filter((d) => d.enabled).length} / ${data.length}`}
+        eyebrow={`Agents · ${'Agent 注册'}`}
+        title={t('agents.title')}
+        sub={t('agents.subtitle').replace('{total}', String(total)).replace('{enabled}', String(data.filter((d) => d.enabled).length)).replace('{count}', String(data.length))}
         actions={
           <Space>
             <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>

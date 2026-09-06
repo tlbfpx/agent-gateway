@@ -11,6 +11,7 @@ import {
    DownloadOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import { listAuditLogs, downloadAuditCsv } from '../lib/api/audit';
 import type { AuditEntry } from '../lib/api/audit';
@@ -41,6 +42,7 @@ export function rangeToFrom(range: string): string | undefined {
 }
 
 export function Audit() {
+  const t = useT();
   // Dashboard 活动流下钻：?keyword= 预填搜索关键字
   const [searchParams] = useSearchParams();
   const initialKeyword = searchParams.get('keyword') ?? '';
@@ -126,8 +128,8 @@ export function Audit() {
   return (
     <>
       <PageHeader
-        eyebrow="Audit · 审计"
-        title="审计日志"
+        eyebrow={`Audit · ${'审计'}`}
+        title={t('audit.title')}
         sub={
           <Space>
             <span>租户 {tenant}</span>
@@ -229,7 +231,7 @@ export function Audit() {
                 <div style={{ padding: '8px 12px', background: 'var(--bg-sunken)', borderRadius: 4 }}>
                   <Space style={{ marginBottom: 8 }}>
                     <strong style={{ fontSize: 12 }}>Detail</strong>
-                    <Tooltip title="复制 JSON">
+                    <Tooltip title={t('audit.copyJson')}>
                       <Button
                         size="small"
                         type="text"
