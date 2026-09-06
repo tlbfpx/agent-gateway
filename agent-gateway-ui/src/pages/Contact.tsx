@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -67,20 +68,20 @@ const TIERS = [
   {
     name: 'Community',
     color: 'default',
-    blurb: '自助 GitHub Discussions + 文档。',
-    cta: { label: '去 GitHub Discussions', to: 'https://github.com/tlbfpx/agent-gateway/discussions' },
+    blurb: { zh: '自助 GitHub Discussions + 文档。', en: 'Self-serve GitHub Discussions + docs.' },
+    cta: { zh: '去 GitHub Discussions', en: 'GitHub Discussions', to: 'https://github.com/tlbfpx/agent-gateway/discussions' },
   },
   {
     name: 'Team',
     color: 'blue',
-    blurb: '工单 24h 响应 + Slack 共享频道（30 天）。',
-    cta: { label: '升级到 Team', to: '/pricing' },
+    blurb: { zh: '工单 24h 响应 + Slack 共享频道（30 天）。', en: 'Ticket 24h response + shared Slack (30 days).' },
+    cta: { zh: '升级到 Team', en: 'Upgrade to Team', to: '/pricing' },
   },
   {
     name: 'Enterprise',
     color: 'gold',
-    blurb: '7×24h 响应 + 专属 Slack + 季度架构评审。',
-    cta: { label: '联系销售', to: 'mailto:sales@agent-gateway.local' },
+    blurb: { zh: '7×24h 响应 + 专属 Slack + 季度架构评审。', en: '24/7 response + dedicated Slack + quarterly review.' },
+    cta: { zh: '联系销售', en: 'Contact sales', to: 'mailto:sales@agent-gateway.local' },
   },
 ];
 
@@ -90,12 +91,16 @@ const TIERS = [
  *  把客户想问的问题路由到正确邮箱，避免「sales@ 收到 PGP key 请求」这种低效沟通。
  */
 export function Contact() {
+  const t = useT();
+  const lang = (typeof window !== 'undefined'
+    && window.localStorage?.getItem('agent-gateway.lang')) as 'zh' | 'en' | null ?? 'zh';
+
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <PageHeader
         eyebrow="Contact"
-        title="联系我们"
-        sub="按问题类型选通道 — 7×24h 响应，5 工作日 SLA"
+        title={t('contact.title')}
+        sub={t('contact.subtitle')}
       />
 
       <Row gutter={[16, 16]}>
@@ -122,19 +127,19 @@ export function Contact() {
         ))}
       </Row>
 
-      <Card title="按版本选支持通道">
+      <Card title={t('contact.tierSupport')}>
         <Row gutter={[16, 16]}>
-          {TIERS.map((t) => (
-            <Col xs={24} md={8} key={t.name}>
+          {TIERS.map((t2) => (
+            <Col xs={24} md={8} key={t2.name}>
               <Card size="small">
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                   <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                    <Text strong>{t.name}</Text>
-                    <Tag color={t.color}>{t.color === 'gold' ? '推荐' : t.color}</Tag>
+                    <Text strong>{t2.name}</Text>
+                    <Tag color={t2.color}>{t2.color === 'gold' ? (lang === 'en' ? 'Recommended' : '推荐') : t2.color}</Tag>
                   </Space>
-                  <Paragraph type="secondary" style={{ margin: 0 }}>{t.blurb}</Paragraph>
-                  <Link to={t.cta.to}>
-                    <Button block>{t.cta.label}</Button>
+                  <Paragraph type="secondary" style={{ margin: 0 }}>{t2.blurb[lang]}</Paragraph>
+                  <Link to={t2.cta.to}>
+                    <Button block>{t2.cta[lang]}</Button>
                   </Link>
                 </Space>
               </Card>
@@ -145,7 +150,7 @@ export function Contact() {
 
       <Card size="small">
         <Paragraph type="secondary" style={{ margin: 0 }}>
-          💡 内部沟通渠道（Slack / 钉钉 / 飞书）需先建立 NDA。Enterprise 客户签约后 5 个工作日内开通专属频道。
+          {t('contact.internalHint')}
         </Paragraph>
       </Card>
     </Space>

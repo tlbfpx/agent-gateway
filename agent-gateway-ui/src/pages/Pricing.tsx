@@ -147,32 +147,32 @@ export function Pricing() {
 
       {/* 三档定价卡 */}
       <Row gutter={[16, 16]}>
-        {TIERS.map((t2) => (
-          <Col xs={24} md={8} key={t2.key}>
+        {TIERS.map((tier) => (
+          <Col xs={24} md={8} key={tier.key}>
             <Card
-              data-testid={`pricing-tier-${t2.key}`}
+              data-testid={`pricing-tier-${tier.key}`}
               style={{
-                borderColor: t2.highlight ? '#1677ff' : undefined,
-                borderWidth: t2.highlight ? 2 : 1,
+                borderColor: tier.highlight ? '#1677ff' : undefined,
+                borderWidth: tier.highlight ? 2 : 1,
               }}
             >
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                  <Text strong style={{ fontSize: 18 }}>{t2.name}</Text>
-                  {t2.highlight && <Tag color="blue">{t('pricing.recommended')}</Tag>}
+                  <Text strong style={{ fontSize: 18 }}>{tier.name}</Text>
+                  {tier.highlight && <Tag color="blue">{t('pricing.recommended')}</Tag>}
                 </Space>
                 <Space align="baseline">
-                  <Text style={{ fontSize: 32, fontWeight: 700 }}>{t.price}</Text>
-                  <Text type="secondary">{t.period}</Text>
+                  <Text style={{ fontSize: 32, fontWeight: 700 }}>{tier.price}</Text>
+                  <Text type="secondary">{tier.period}</Text>
                 </Space>
-                <Paragraph type="secondary" style={{ margin: 0 }}>{t.blurb}</Paragraph>
-                <Link to={t.cta.to}>
+                <Paragraph type="secondary" style={{ margin: 0 }}>{tier.blurb}</Paragraph>
+                <Link to={tier.cta.to}>
                   <Button
-                    type={t.highlight ? 'primary' : 'default'}
+                    type={tier.highlight ? 'primary' : 'default'}
                     block
                     size="large"
                   >
-                    {t.cta.label}
+                    {tier.cta.label}
                   </Button>
                 </Link>
               </Space>
