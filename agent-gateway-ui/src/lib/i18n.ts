@@ -65,6 +65,29 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'contact.communityDesc':{ zh: '用例分享、feature request、最佳实践。GitHub Discussions 公开归档。', en: 'Use cases, feature requests, best practices. Public GitHub Discussions.' },
   'contact.tierSupport':  { zh: '按版本选支持通道', en: 'Support by plan' },
   'contact.internalHint':{ zh: '内部沟通渠道（Slack / 钉钉 / 飞书）需先建立 NDA。Enterprise 客户签约后 5 个工作日内开通专属频道。', en: 'Internal channels (Slack/DingTalk/Feishu) require NDA. Enterprise clients get dedicated channel within 5 business days.' },
+
+  // ---- /getting-started ----
+  'gs.title':       { zh: '快速上手', en: 'Get started' },
+  'gs.subtitle':    { zh: '按这 5 步走完，10 分钟解锁全部能力', en: '5 steps · 10 minutes · all features unlocked' },
+  'gs.complete':    { zh: '全部完成', en: 'All done!' },
+  'gs.step.signup':     { zh: '注册账号', en: 'Sign up' },
+  'gs.step.signupDesc': { zh: '邮箱 + 公司名 + 密码（≥8 位）。10 秒开通独立租户。', en: 'Email + company + password (8+). 10 seconds, your own tenant.' },
+  'gs.step.createKey':  { zh: '签发首把 API Key', en: 'Create your first API Key' },
+  'gs.step.createKeyDesc': { zh: '进入「设置」一键签发。所有功能都靠 Key 调用（chat/feedback/metrics/cache）。', en: 'Settings → one click. Every feature needs a Key.' },
+  'gs.step.tryChat':    { zh: '试一次对话', en: 'Try a chat' },
+  'gs.step.tryChatDesc': { zh: '进入「对话」页，选 echo-agent（演示用），发送「你好」。能看到完整 SSE 流式响应。', en: 'Chat → echo-agent → \"hi\". Full SSE response.' },
+  'gs.step.audit':      { zh: '查看审计日志', en: 'Check audit log' },
+  'gs.step.auditDesc':  { zh: '刚才的 chat 调用会自动记录到「审计」页。SOC2 合规：右上角可导出 CSV。', en: 'Your chat auto-logs to Audit. SOC2: export CSV top-right.' },
+  'gs.step.sso':       { zh: '（可选）接入企业 SSO', en: '(optional) Enterprise SSO' },
+  'gs.step.ssoDesc':   { zh: 'Azure AD / Okta / Auth0 / Google 全部支持。5 分钟接入指南在 docs/operators/OIDC.md。', en: 'Azure AD / Okta / Auth0 / Google. 5-min guide in docs/operators/OIDC.md.' },
+  'gs.action.go':      { zh: '去操作', en: 'Open' },
+  'gs.refreshHint':    { zh: '需要更多帮助？', en: 'Need more help?' },
+
+  // ---- /changelog ----
+  'cl.title':      { zh: '产品变更日志', en: 'Product changelog' },
+  'cl.subtitle':   { zh: '关注进度与升级路径', en: 'Track progress & upgrade path' },
+  'cl.empty':      { zh: '暂无可显示的 release', en: 'No releases to show' },
+  'cl.upgradePath':{ zh: '升级路径：每个 bullet 都是独立 atomic commit，按需 revert。', en: 'Upgrade: each bullet is an atomic commit, revert as needed.' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, Space, Tag, Typography, Spin, Alert } from 'antd';
 import { RocketOutlined, BugOutlined, ToolOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 
 const { Text, Paragraph } = Typography;
 
@@ -44,6 +45,8 @@ export function Changelog() {
       .catch((e) => setError(e.message));
   }, []);
 
+  const t = useT();
+
   if (error) {
     return (
       <>
@@ -68,12 +71,12 @@ export function Changelog() {
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <PageHeader
         eyebrow="Changelog"
-        title="产品变更日志"
-        sub={`共 ${data.releases.length} 个 release · 关注进度与升级路径`}
+        title={t('cl.title')}
+        sub={`共 ${data.releases.length} 个 release · ${t('cl.subtitle')}`}
       />
 
       {data.releases.length === 0 && (
-        <Alert type="info" message="暂无可显示的 release" />
+        <Alert type="info" message={t('cl.empty')} />
       )}
 
       {data.releases.map((rel) => (
@@ -115,7 +118,7 @@ export function Changelog() {
       ))}
 
       <Paragraph type="secondary" style={{ textAlign: 'center', margin: 0, fontSize: 12 }}>
-        升级路径：每个 bullet 都是独立 atomic commit，按需 revert。
+        {t('cl.upgradePath')}
       </Paragraph>
     </Space>
   );

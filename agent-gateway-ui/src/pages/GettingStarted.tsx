@@ -11,13 +11,14 @@ import {
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/framework/PageHeader';
 import { getApiKey, getAdminToken, getTenant } from '../lib/request';
+import { useT } from '../lib/i18n';
 
 const { Text, Paragraph } = Typography;
 
 interface Step {
   key: string;
-  title: string;
-  desc: string;
+  titleKey: string;
+  descKey: string;
   /** 页内可执行跳转；null 表示无需跳转（已自动完成） */
   to?: string;
   /** 检测此步是否已完成的钩子（基于 localStorage / 路由查询） */
@@ -27,36 +28,36 @@ interface Step {
 const STEPS: Step[] = [
   {
     key: 'signup',
-    title: '注册账号',
-    desc: '邮箱 + 公司名 + 密码（≥8 位）。10 秒开通独立租户。',
+    titleKey: 'gs.step.signup',
+    descKey: 'gs.step.signupDesc',
     to: '/signup',
     done: () => !!getAdminToken(),
   },
   {
     key: 'create-key',
-    title: '签发首把 API Key',
-    desc: '进入「设置」一键签发。所有功能都靠 Key 调用（chat/feedback/metrics/cache）。',
+    titleKey: 'gs.step.createKey',
+    descKey: 'gs.step.createKeyDesc',
     to: '/settings',
     done: () => !!getApiKey(),
   },
   {
     key: 'try-chat',
-    title: '试一次对话',
-    desc: '进入「对话」页，选 echo-agent（演示用），发送「你好」。能看到完整 SSE 流式响应。',
+    titleKey: 'gs.step.tryChat',
+    descKey: 'gs.step.tryChatDesc',
     to: '/chat',
-    done: () => false, // 没法检测，留作可选勾选
+    done: () => false,
   },
   {
     key: 'audit',
-    title: '查看审计日志',
-    desc: '刚才的 chat 调用会自动记录到「审计」页。SOC2 合规：右上角可导出 CSV。',
+    titleKey: 'gs.step.audit',
+    descKey: 'gs.step.auditDesc',
     to: '/audit',
     done: () => false,
   },
   {
     key: 'sso',
-    title: '（可选）接入企业 SSO',
-    desc: 'Azure AD / Okta / Auth0 / Google 全部支持。5 分钟接入指南在 docs/operators/OIDC.md。',
+    titleKey: 'gs.step.sso',
+    descKey: 'gs.step.ssoDesc',
     to: '/login',
     done: () => false,
   },
@@ -102,19 +103,20 @@ export function GettingStarted() {
 
   const doneCount = STEPS.filter((s) => done[s.key]).length;
   const pct = Math.round((doneCount / STEPS.length) * 100);
+  const t = useT();
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <PageHeader
         eyebrow="Onboarding"
-        title="快速上手"
-        sub="按这 5 步走完，10 分钟解锁全部能力"
+        title={t('gs.title')}
+        sub={t('gs.subtitle')}
       />
 
       <Card>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-            <Text strong>已完成 {doneCount}/{STEPS.length} 步</Text>
+            <Text strong>{(typeof window !== 'undefined' && window.localStorage?.getItem('agent-gateway.lang') === 'en' ? `${doneCount}/${STEPS.length} done` : `已完成 ${doneCount}/${STEPS.length} 步`)}</Text>
             <Tag color={pct === 100 ? 'success' : pct >= 50 ? 'processing' : 'default'}>
               {pct === 100 ? '🎉 全部完成' : `${pct}%`}
             </Tag>
@@ -152,7 +154,7 @@ export function GettingStarted() {
             }}
           >
             <Space style={{ width: '100%' }} size="middle" align="start">
-              <Tooltip title={finished ? '已完成' : '点击右侧按钮标记完成'}>
+              <Tooltip title={finished ? t('gs.complete') : ''}>
                 <Button
                   type="text"
                   size="large"
@@ -170,15 +172,15 @@ export function GettingStarted() {
               </Tooltip>
               <Space direction="vertical" size={4} style={{ flex: 1 }}>
                 <Space size="small">
-                  <Text strong style={{ fontSize: 16 }}>{step.title}</Text>
-                  {finished && <Tag color="success">已完成</Tag>}
+                  <Text strong style={{ fontSize: 16 }}>{t(step.titleKey)}</Text>
+                  {finished && <Tag color="success">{t('gs.complete')}</Tag>}
                 </Space>
-                <Paragraph type="secondary" style={{ margin: 0 }}>{step.desc}</Paragraph>
+                <Paragraph type="secondary" style={{ margin: 0 }}>{t(step.descKey)}</Paragraph>
               </Space>
               {step.to && (
                 <Link to={step.to}>
                   <Button type={finished ? 'default' : 'primary'} icon={<RocketOutlined />}>
-                    去操作
+                    {t('gs.action.go')}
                   </Button>
                 </Link>
               )}
@@ -190,7 +192,7 @@ export function GettingStarted() {
       <Alert
         type="info"
         showIcon
-        message="需要更多帮助？"
+        message={t('gs.refreshHint')}
         description={
           <Space split={<Text type="secondary">|</Text>}>
             <Link to="/changelog">查看更新日志</Link>
