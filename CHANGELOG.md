@@ -2,6 +2,33 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [0.4.0] — 2026-09-07
+
+i18n 完整 + 可监控 + 可集成：海外买家 0 摩擦走完试用漏斗。
+
+### ✨ New Features
+- **i18n（zh / en）** — header 顶部语言切换按钮；antd ConfigProvider 接 enUS / zhCN locale
+  · 公开页双语：/welcome /demo /signup /login /settings /pricing /contact /getting-started /changelog /legal/*
+- **/welcome 公开营销首页** — Sales 分享链接首屏（Hero + 4 卡 + 信任徽章 + 3 CTA）
+- **OIDC RP-Initiated Logout** — `GET /v1/auth/oidc/logout` 完整登出
+- **/oauth/callback 端到端落地页** — token 走 URL fragment 落 localStorage
+- **scripts/setup-public-demo.sh** — `demo.agent-gateway.com` 一键 k8s 部署
+- **docs/sales/demo-instance.md** — 公开 demo 部署操作手册 + 销售话术 + 故障应急
+- **/v1/info 元数据端点** — 公开 build / feature flags / GitHub 链接
+- **/v1/admin/stats 业务计数** — demo / signup / active API keys
+- **/v1/admin/stats/prom Prometheus 抓取** — 4 个指标可被 Grafana 看板消费
+- **/v1/openapi.json 公开** — 集成方自助生成客户端 SDK
+- **漏斗埋点** — `src/lib/analytics.ts` PostHog 兼容 / no-op 默认
+  · 5 事件：demo_click / demo_bootstrap / signup_start / signup_success / pricing_cta_click
+
+### 📦 Internal
+- 修复 8 个 pre-existing TS 错误（useUrlState overload / CostCenter props / Traces setter 等）
+- 35+ 单测（OIDC 31 + Info 4 + Demo/Signup 等）
+- TS 0 错
+- 路由巡检 41/41 全绿
+
+---
+
 ## [0.3.0] — 2026-09-06
 
 SaaS 化就绪：多租户独立 IdP 完整支持。
