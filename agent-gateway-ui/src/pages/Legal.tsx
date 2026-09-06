@@ -1,5 +1,6 @@
 import { Card, Space, Typography } from 'antd';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -18,50 +19,59 @@ export function Terms({ kind }: LegalProps) {
   return <PrivacyBody />;
 }
 
+function langOf(): 'zh' | 'en' {
+  if (typeof window === 'undefined') return 'zh';
+  return (window.localStorage?.getItem('agent-gateway.lang') as 'zh' | 'en' | null) ?? 'zh';
+}
+
 function TermsBody() {
+  const t = useT();
+  const lang = langOf();
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <PageHeader
-        eyebrow="Legal · 服务条款"
+        eyebrow={`Legal · ${t('terms.title')}`}
         title="Terms of Service"
-        sub={`最后更新：2026-09-05 · v0.2.0`}
+        sub={`${t('terms.lastUpd')}: 2026-09-05 · v0.2.0`}
       />
       <Card>
         <Space direction="vertical" size="middle" style={{ lineHeight: 1.8 }}>
-          <section><Title level={3}>1. 服务范围</Title>
+          <section><Title level={3}>{t('terms.s1.title')}</Title>
             <Paragraph>
-              Agent Gateway（以下简称"网关"）是一款企业级 AI Agent 网关软件。
-              <Text strong>开源版本</Text>采用 Apache-2.0 协议，源码可自由使用、修改、分发，
-              <Text strong>无任何保证</Text>。
+              {t('terms.s1.p1')} <Text strong>{t('terms.s1.p1.os')}</Text> {t('terms.s1.p1.bsl')}
+              <Text strong>{t('terms.s1.p1.war')}</Text>{lang === 'zh' ? '。' : '.'}
             </Paragraph>
             <Paragraph>
-              <Text strong>商业服务</Text>（Team / Enterprise）由网关运营方提供 SLA 支持，
-             具体条款以双方签订的商业合同为准。
+              <Text strong>{t('terms.s1.p2')}</Text>{t('terms.s1.p2.body')}
             </Paragraph>
           </section>
 
-          <section><Title level={3}>2. 数据所有权</Title>
+          <section><Title level={3}>{t('terms.s2.title')}</Title>
             <Paragraph>
-              您的租户数据（包括但不限于：API Key、调用日志、审计记录、计费数据）归您所有。
-              网关运营方不在您的书面授权下访问、修改或披露您的数据（除非法律法规强制要求）。
+              {t('terms.s2.p1')}
             </Paragraph>
             <Paragraph>
-              卸载时：自助删除 Postgres 表 + 清空 <code>data/</code> 目录即可；如有需要可联系
-              运营方协助（Enterprise SLA 内）。
+              {t('terms.s2.p2')}
             </Paragraph>
           </section>
 
-          <section><Title level={3}>3. Demo 模式</Title>
+          <section><Title level={3}>{t('terms.s3.title')}</Title>
             <Paragraph>
-              Demo 模式（<code>/demo</code>）创建临时试用租户，<Text strong>24 小时</Text>自动清理 API Key 和租户数据。
-              不应用于生产或存放真实业务数据。
+              {lang === 'zh' ? (
+                <>Demo 模式（<code>/demo</code>）创建临时试用租户，<Text strong>24 小时</Text>自动清理 API Key 和租户数据。不应用于生产或存放真实业务数据。</>
+              ) : (
+                <>Demo mode (<code>/demo</code>) creates a temporary trial tenant; API keys and tenant data are auto-cleaned after <Text strong>24 hours</Text>. Do not use it for production or real business data.</>
+              )}
             </Paragraph>
           </section>
 
-          <section><Title level={3}>4. 安全披露</Title>
+          <section><Title level={3}>{t('terms.s4.title')}</Title>
             <Paragraph>
-              漏洞报告：<a href="mailto:security@agent-gateway.local">security@agent-gateway.local</a>。
-              我们承诺 7 个工作日内响应，严重漏洞 24 小时内修复。
+              {lang === 'zh' ? (
+                <>漏洞报告：<a href="mailto:security@agent-gateway.local">security@agent-gateway.local</a>。我们承诺 7 个工作日内响应，严重漏洞 24 小时内修复。</>
+              ) : (
+                <>Report vulnerabilities to <a href="mailto:security@agent-gateway.local">security@agent-gateway.local</a>. We commit to a 7-business-day response; critical issues patched within 24 hours.</>
+              )}
             </Paragraph>
           </section>
 
@@ -79,59 +89,63 @@ function TermsBody() {
 }
 
 function PrivacyBody() {
+  const t = useT();
+  const lang = langOf();
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <PageHeader
-        eyebrow="Legal · 隐私政策"
+        eyebrow={`Legal · ${t('privacy.title')}`}
         title="Privacy Policy"
-        sub={`最后更新：2026-09-05 · v0.2.0`}
+        sub={`${t('terms.lastUpd')}: 2026-09-05 · v0.2.0`}
       />
       <Card>
         <Space direction="vertical" size="middle" style={{ lineHeight: 1.8 }}>
-          <section><Title level={3}>1. 我们收集的数据</Title>
+          <section><Title level={3}>{t('privacy.s1.title')}</Title>
             <Paragraph>
-              <Text strong>您提供的数据</Text>：邮箱、租户名（自助注册）、OIDC 元数据
-              （仅在你启用企业 SSO 时）。
+              <Text strong>{t('privacy.s1.sub1')}</Text>{t('privacy.s1.sub1.body')}
             </Paragraph>
             <Paragraph>
-              <Text strong>服务运行时数据</Text>：API Key 哈希（PBKDF2-HMAC-SHA256 + 16 字节 salt + 32 字节 hash +
-              100k 迭代）、调用日志（含时间戳 / 模型 / token 用量 / HTTP 状态码）、审计事件。
+              <Text strong>{t('privacy.s1.sub2')}</Text>{t('privacy.s1.sub2.body')}
             </Paragraph>
             <Paragraph>
-              <Text strong>不收集</Text>：聊天内容（除非您主动开启 trace 录制）、请求/响应正文（除非
-              显式配置 body logging）、用户行为分析（无第三方 analytics）。
+              <Text strong>{t('privacy.s1.sub3')}</Text>{t('privacy.s1.sub3.body')}
             </Paragraph>
           </section>
 
-          <section><Title level={3}>2. 数据存储与传输</Title>
+          <section><Title level={3}>{t('privacy.s2.title')}</Title>
             <Paragraph>
-              数据存储：PostgreSQL（TimescaleDB extension，可选）、<code>data/*.json</code> 文件。
-              传输加密：TLS 1.2+（Ingress/Helm chart 默认 cert-manager 自动签证书）。
+              {t('privacy.s2.p1')}
             </Paragraph>
           </section>
 
-          <section><Title level={3}>3. 数据使用</Title>
+          <section><Title level={3}>{t('privacy.s3.title')}</Title>
+            <Paragraph>{t('privacy.s3.intro')}</Paragraph>
             <Paragraph>
-              网关运营方 <Text strong>不会</Text>：
-            </Paragraph>
-            <Paragraph>
-              - 用您的数据训练任何 AI 模型<br />
-              - 与第三方共享您的数据<br />
-              - 用您的行为做产品分析（除非您启用可选的 PostHog 集成）
-            </Paragraph>
-          </section>
-
-          <section><Title level={3}>4. 您的权利</Title>
-            <Paragraph>
-              您随时可以：导出全部租户数据（PG dump + <code>data/*.json</code>）；
-              删除租户（删 PG 表 + 清 <code>data/</code> 目录）；
-              撤回 OIDC token（浏览器登出 IdP 会话）；撤回 API Key。
+              {lang === 'zh' ? (
+                <>- {t('privacy.s3.b1')}<br />- {t('privacy.s3.b2')}<br />- {t('privacy.s3.b3')}</>
+              ) : (
+                <>- {t('privacy.s3.b1')},<br />- {t('privacy.s3.b2')},<br />- {t('privacy.s3.b3')}.</>
+              )}
             </Paragraph>
           </section>
 
-          <section><Title level={3}>5. 联系</Title>
+          <section><Title level={3}>{t('privacy.s4.title')}</Title>
             <Paragraph>
-              数据相关问题：<a href="mailto:privacy@agent-gateway.local">privacy@agent-gateway.local</a>。
+              {lang === 'zh' ? (
+                <>您随时可以：导出全部租户数据（PG dump + <code>data/*.json</code>）；删除租户（删 PG 表 + 清 <code>data/</code> 目录）；撤回 OIDC token（浏览器登出 IdP 会话）；撤回 API Key。</>
+              ) : (
+                <>You can at any time: export all tenant data (pg_dump + <code>data/*.json</code>); delete the tenant (drop tables + clear <code>data/</code>); revoke the OIDC token (sign out of the IdP); revoke API keys.</>
+              )}
+            </Paragraph>
+          </section>
+
+          <section><Title level={3}>{t('privacy.s5.title')}</Title>
+            <Paragraph>
+              {lang === 'zh' ? (
+                <>数据相关问题：<a href="mailto:privacy@agent-gateway.local">privacy@agent-gateway.local</a>。</>
+              ) : (
+                <>Data-related inquiries: <a href="mailto:privacy@agent-gateway.local">privacy@agent-gateway.local</a>.</>
+              )}
             </Paragraph>
           </section>
         </Space>
