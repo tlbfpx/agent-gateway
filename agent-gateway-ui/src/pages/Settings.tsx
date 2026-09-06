@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Form, Input, Button, Space, message, Alert, Select, Tag, Card } from 'antd';
 import { ThunderboltOutlined } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { getApiKey, setApiKey, getTenant, setTenant, getAdminToken, setAdminToken } from '../lib/request';
 import { RestartOnboardingButton } from '../components/framework/Onboarding';
 import { DisplaySwitcher } from '../components/framework/DisplaySwitcher';
@@ -86,19 +87,21 @@ export function Settings() {
     }
   };
 
+  const t = useT();
+
   return (
     <>
       <PageHeader
-        eyebrow="Settings · 设置"
-        title="凭据与租户"
-        sub="API Key 与租户 ID 保存在 localStorage"
+        eyebrow={`Settings · ${t('settings.title')}`}
+        title={t('settings.title')}
+        sub={t('settings.subtitle')}
       />
 
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="修改后将立即作用于全部后续请求，401 会自动清空。"
+        message={t('settings.alert')}
       />
 
       {needsFirstKey && (
@@ -162,31 +165,31 @@ export function Settings() {
           initialValues={{ apiKey: getApiKey(), tenant: getTenant(), adminToken: getAdminToken() }}
         >
           <Form.Item
-            label="X-API-Key"
+            label={t('settings.apiKey')}
             name="apiKey"
             tooltip="从网关 POST /v1/admin/api-keys 签发"
           >
             <Input.Password placeholder="pk_..." />
           </Form.Item>
           <Form.Item
-            label="X-Tenant-Id"
+            label={t('settings.tenantId')}
             name="tenant"
             tooltip="多租户场景必填，默认 primary"
           >
-            <Input placeholder="primary" />
+            <Input placeholder={t('settings.tenantIdPh')} />
           </Form.Item>
           <Form.Item
-            label="X-Admin-Token"
+            label={t('settings.adminTok')}
             name="adminToken"
-            tooltip="管理端点独立凭据（gateway.security.admin-token）；留空 = 后端未启用管理鉴权"
+            tooltip={t('settings.adminTokHint')}
           >
-            <Input.Password placeholder="留空则不发送" autoComplete="new-password" />
+            <Input.Password placeholder={t('settings.adminTokenPh')} autoComplete="new-password" />
           </Form.Item>
           <Space>
             <Button type="primary" onClick={onSave} loading={saving}>
-              保存
+              {t('settings.save')}
             </Button>
-            <Button onClick={onClear}>清除凭据</Button>
+            <Button onClick={onClear}>{t('settings.clear')}</Button>
           </Space>
         </Form>
       </div>

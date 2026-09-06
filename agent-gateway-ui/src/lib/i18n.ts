@@ -141,6 +141,28 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'privacy.s5.title':  { zh: '5. 联系', en: '5. Contact' },
   'privacy.s5.p1':     { zh: '数据相关问题：privacy@agent-gateway.local。',
                             en: 'Data-related inquiries: privacy@agent-gateway.local.' },
+
+  // ---- /settings ----
+  'settings.title':     { zh: '凭据与租户', en: 'Credentials & tenant' },
+  'settings.subtitle':  { zh: 'API Key 与租户 ID 保存在 localStorage', en: 'API Key & tenant ID live in localStorage' },
+  'settings.alert':     { zh: '修改后将立即作用于全部后续请求，401 会自动清空。', en: 'Changes apply to all subsequent requests. 401 auto-clears.' },
+  'settings.apiKey':    { zh: 'X-API-Key', en: 'X-API-Key' },
+  'settings.tenantId':  { zh: 'X-Tenant-Id', en: 'X-Tenant-Id' },
+  'settings.adminTok':  { zh: 'X-Admin-Token', en: 'X-Admin-Token' },
+  'settings.adminTokHint': { zh: '管理端点独立凭据（gateway.security.admin-token）；留空 = 后端未启用管理鉴权',
+                             en: 'Admin-only credential (gateway.security.admin-token). Leave blank = admin auth disabled on backend' },
+  'settings.save':      { zh: '保存', en: 'Save' },
+  'settings.clear':     { zh: '清除凭据', en: 'Clear credentials' },
+  'settings.cleared':   { zh: '已清除', en: 'Cleared' },
+  'settings.firstKeyBtn': { zh: '一键签发首把 API Key', en: 'Create first API Key' },
+  'settings.tenantIdPh': { zh: 'primary', en: 'primary' },
+  'settings.adminTokenPh': { zh: '留空则不发送', en: 'leave blank to skip' },
+  'settings.creating':  { zh: '签发中…', en: 'Creating…' },
+  'settings.createSuccess': { zh: '已签发首把 API Key', en: 'First API Key created' },
+  'settings.issuedKeyHint': { zh: 'Key 已签发并自动写入本地', en: 'Key created and stored locally' },
+  'settings.keyNote':   { zh: '完整值已写入 localStorage.agent-gateway.apiKey · 下次启动自动带入',
+                          en: 'Full value in localStorage.agent-gateway.apiKey, auto-loaded on next start' },
+  'settings.refreshStatus': { zh: '我已有 Key · 刷新状态', en: 'I have a key · refresh status' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
