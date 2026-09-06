@@ -58,6 +58,33 @@ public class AdminStatsController {
         return out;
     }
 
+    /**
+     * Prometheus 抓取端点（spec §business-stats round 40）：
+     *   GET /v1/admin/stats/prom -H "X-Admin-Token: ..."
+     *
+     * <p>返回 text/plain Prometheus exposition 格式；Grafana / 监控系统可直接 scrape。
+     * 单调计数器（demo_count / signup_count）抓取累加值。
+     */
+    @GetMapping(value = "/stats/prom", produces = "text/plain;version=0.0.4;charset=utf-8")
+    public String statsProm(
+            @RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
+        if (adminToken == null || adminToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "X-Admin-Token required");
+        }
+        long demo = demoService.getBootstrapCount();
+        long signup = signupService.getSignupCount();
+        long up = uptimeSeconds();
+        return "# HELP agent_gateway_demo_count_total Total demo bootstrap count\n"
+                + "# TYPE agent_gateway_demo_count_total counter\n"
+                + "agent_gateway_demo_count_total " + demo + "\n"
+                + "# HELP agent_gateway_signup_count_total Total signup count\n"
+                + "# TYPE agent_gateway_signup_count_total counter\n"
+                + "agent_gateway_signup_count_total " + signup + "\n"
+                + "# HELP agent_gateway_uptime_seconds Process uptime in seconds\n"
+                + "# TYPE agent_gateway_uptime_seconds gauge\n"
+                + "agent_gateway_uptime_seconds " + up + "\n";
+    }
+
     private static long uptimeSeconds() {
         return (System.currentTimeMillis()
                 - ManagementFactory.getRuntimeMXBean().getStartTime()) / 1000;
