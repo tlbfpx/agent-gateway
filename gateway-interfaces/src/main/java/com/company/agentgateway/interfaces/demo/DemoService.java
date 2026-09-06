@@ -36,6 +36,14 @@ import java.util.UUID;
 @Service
 public class DemoService {
 
+    /** 累计 demo bootstrap 次数（spec §business-stats round 39）。重启清零。 */
+    private final java.util.concurrent.atomic.AtomicLong bootstrapCount =
+            new java.util.concurrent.atomic.AtomicLong(0);
+
+    public long getBootstrapCount() {
+        return bootstrapCount.get();
+    }
+
     private static final Logger log = LoggerFactory.getLogger(DemoService.class);
     private static final SecureRandom RNG = new SecureRandom();
 
@@ -108,6 +116,7 @@ public class DemoService {
             throw new IllegalStateException("admin login bootstrap failed: " + e.getMessage(), e);
         }
 
+        bootstrapCount.incrementAndGet();
         return new DemoSession(
                 tenantId,
                 apiKey,

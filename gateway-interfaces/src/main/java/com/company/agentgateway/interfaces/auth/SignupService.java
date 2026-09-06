@@ -36,6 +36,14 @@ import java.util.regex.Pattern;
 @Service
 public class SignupService {
 
+    /** 累计 signup 次数（spec §business-stats round 39）。重启清零。 */
+    private final java.util.concurrent.atomic.AtomicLong signupCount =
+            new java.util.concurrent.atomic.AtomicLong(0);
+
+    public long getSignupCount() {
+        return signupCount.get();
+    }
+
     private static final Logger log = LoggerFactory.getLogger(SignupService.class);
     private static final SecureRandom RNG = new SecureRandom();
     private static final Pattern EMAIL_RE =
@@ -83,6 +91,7 @@ public class SignupService {
         }
 
         log.info("signup.ok tenant={} email={}", tenantId, user.email());
+        signupCount.incrementAndGet();
         return new SignupResult(tenantId, user.email(), login.token());
     }
 
