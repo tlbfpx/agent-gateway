@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ConfigProvider, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
+import enUS from 'antd/locale/en_US';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes';
 // ⚠️ tokens.css 必须在 global.css 之前导入 — 它定义了 :root CSS 变量
@@ -71,6 +72,13 @@ function readTheme(): 'light' | 'dark' {
  */
 function ThemedApp() {
   const [mode, setMode] = useState<'light' | 'dark'>(readTheme);
+  // 默认中文；localStorage.lang 切换 enUS / zhCN
+  const [lang, setLang] = useState<'zh' | 'en'>(() => {
+    const stored = localStorage.getItem('agent-gateway.lang') as 'zh' | 'en' | null;
+    if (stored === 'en') return 'en';
+    if (stored === 'zh') return 'zh';
+    return 'zh';
+  });
 
   useEffect(() => {
     const observer = new MutationObserver(() => setMode(readTheme()));
@@ -81,8 +89,23 @@ function ThemedApp() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const v = document.documentElement.getAttribute('data-lang');
+      if (v === 'en' || v === 'zh') setLang(v);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-lang'],
+    });
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <ConfigProvider theme={mode === 'dark' ? darkConfig : lightConfig} locale={zhCN}>
+    <ConfigProvider
+      theme={mode === 'dark' ? darkConfig : lightConfig}
+      locale={lang === 'en' ? enUS : zhCN}
+    >
       <RouterProvider router={router} />
     </ConfigProvider>
   );
