@@ -3,6 +3,7 @@ package com.company.agentgateway.interfaces.admin;
 import com.company.agentgateway.interfaces.auth.SignupService;
 import com.company.agentgateway.interfaces.demo.DemoService;
 import com.company.agentgateway.interfaces.info.InfoController;
+import com.company.agentgateway.infra.security.ApiKeyStore;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,10 +36,13 @@ public class AdminStatsController {
 
     private final DemoService demoService;
     private final SignupService signupService;
+    private final ApiKeyStore apiKeyStore;
 
-    public AdminStatsController(DemoService demoService, SignupService signupService) {
+    public AdminStatsController(DemoService demoService, SignupService signupService,
+                               ApiKeyStore apiKeyStore) {
         this.demoService = demoService;
         this.signupService = signupService;
+        this.apiKeyStore = apiKeyStore;
     }
 
     @GetMapping("/stats")
@@ -51,6 +55,7 @@ public class AdminStatsController {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("demoCount", demoService.getBootstrapCount());
         out.put("signupCount", signupService.getSignupCount());
+        out.put("activeApiKeys", apiKeyStore.entries().size());
         out.put("uptimeSeconds", uptimeSeconds());
         out.put("version", InfoController.class.getPackage().getImplementationVersion());
         out.put("startTime", Instant.ofEpochMilli(
@@ -73,6 +78,7 @@ public class AdminStatsController {
         }
         long demo = demoService.getBootstrapCount();
         long signup = signupService.getSignupCount();
+        long activeKeys = apiKeyStore.entries().size();
         long up = uptimeSeconds();
         return "# HELP agent_gateway_demo_count_total Total demo bootstrap count\n"
                 + "# TYPE agent_gateway_demo_count_total counter\n"
@@ -80,6 +86,9 @@ public class AdminStatsController {
                 + "# HELP agent_gateway_signup_count_total Total signup count\n"
                 + "# TYPE agent_gateway_signup_count_total counter\n"
                 + "agent_gateway_signup_count_total " + signup + "\n"
+                + "# HELP agent_gateway_active_api_keys Current number of active API keys\n"
+                + "# TYPE agent_gateway_active_api_keys gauge\n"
+                + "agent_gateway_active_api_keys " + activeKeys + "\n"
                 + "# HELP agent_gateway_uptime_seconds Process uptime in seconds\n"
                 + "# TYPE agent_gateway_uptime_seconds gauge\n"
                 + "agent_gateway_uptime_seconds " + up + "\n";
