@@ -123,6 +123,39 @@
 
 每个模块单向依赖 `domain`，由 `verify.sh` 的 dependency:tree 负向断言守住。
 
+## 集成方 API
+
+```bash
+# 1. 拿版本 + feature flags（推荐集成第一步）
+curl https://gateway.example.com/v1/info
+{
+  "name": "agent-gateway",
+  "version": "0.3.0",
+  "buildTimestamp": "2026-09-05T07:43:08Z",
+  "uptimeSeconds": 12345,
+  "javaVersion": "21.0.10",
+  "features": {
+    "demo": true,
+    "signup": true,
+    "oidc": false,
+    "multiTenantOidc": false
+  },
+  "changelogUrl": "/v1/changelog",
+  "githubUrl": "https://github.com/tlbfpx/agent-gateway"
+}
+
+# 2. 看公开健康
+curl https://gateway.example.com/status.json
+# {"status":"UP","version":"0.3.0","uptimeSeconds":...,"services":{...}}
+
+# 3. 拉更新日志（机器可读）
+curl https://gateway.example.com/v1/changelog
+# {"releases":[{"tag":"0.3.0","date":"2026-09-05","sections":{...}}]}
+
+# 4. 拿 OpenAPI spec（生成客户端 SDK）
+curl https://gateway.example.com/v1/openapi.json > openapi.json
+```
+
 ## 运维
 
     ./verify.sh              # 一键门禁：编译+全模块测试+依赖方向断言
