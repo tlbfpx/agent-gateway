@@ -26,6 +26,7 @@ import {
   LockOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../../components/framework/PageHeader';
+import { useT } from '../../lib/i18n';
 import { listModels, createModel, updateModel, deleteModel } from '../../lib/api/models';
 import type { Model } from '../../lib/api/models';
 import { GrayscaleDialog, GrayscaleConclusion } from '../../components/models/GrayscaleDialog';
@@ -55,6 +56,7 @@ function modelStatus(m: Model): 'enabled' | 'gray' | 'disabled' {
 }
 
 export function ModelsList() {
+  const t = useT();
   const [models, setModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -337,8 +339,8 @@ export function ModelsList() {
   return (
     <>
       <PageHeader
-        eyebrow="Models · 模型"
-        title="模型注册与路由"
+        eyebrow={`Models · ${t('models.eyebrow')}`}
+        title={t('models.title')}
         sub={`共 ${counts.all} 条 · 启用 ${counts.enabled} · 灰度 ${counts.gray} · 停用 ${counts.disabled}`}
         actions={
           <>

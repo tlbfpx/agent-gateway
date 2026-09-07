@@ -263,6 +263,10 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /ratelimit ----
   'ratelimit.title': { zh: '限流实时面板', en: 'Rate-limit live dashboard' },
+
+  // ---- /models ----
+  'models.eyebrow': { zh: '模型', en: 'Models' },
+  'models.title':   { zh: '模型注册与路由', en: 'Model registry & routing' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
