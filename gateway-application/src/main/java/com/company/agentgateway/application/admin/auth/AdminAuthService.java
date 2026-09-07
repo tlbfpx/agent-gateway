@@ -33,6 +33,16 @@ public class AdminAuthService {
         this.userRepo = userRepo;
     }
 
+    /** 当前活跃 admin session 数量（spec §admin-sessions round 58）。 */
+    public int activeSessionCount() {
+        long now = System.currentTimeMillis();
+        int c = 0;
+        for (Session s : sessions.values()) {
+            if (s.expiresAt > now) c++;
+        }
+        return c;
+    }
+
     /**
      * 用 email + password 登录;返回 session token(写入 {@code X-Admin-Token})。
      *
