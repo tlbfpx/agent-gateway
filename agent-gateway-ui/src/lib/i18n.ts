@@ -223,6 +223,14 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   // ---- /audit ----
   'audit.title':     { zh: '审计日志', en: 'Audit log' },
   'audit.copyJson':  { zh: '复制 JSON', en: 'Copy JSON' },
+
+  // ---- /traces ----
+  'traces.opType':       { zh: '操作类型', en: 'Operation type' },
+  'traces.minDur':       { zh: '最短耗时 ms', en: 'Min duration ms' },
+  'traces.tenantId':     { zh: '租户 ID', en: 'Tenant ID' },
+  'traces.errorOnly':    { zh: '只看有错误的链路', en: 'Error only' },
+  'traces.autoRefresh':  { zh: '30 秒自动刷新', en: 'Auto refresh 30s' },
+  'traces.compareTraceId':{ zh: '对比目标 traceId', en: 'Compare to traceId' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

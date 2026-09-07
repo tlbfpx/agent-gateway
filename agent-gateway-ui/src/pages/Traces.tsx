@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useUrlState } from '../hooks/useUrlState';
 import { PageLoading } from '../components/framework/PageLoading';
+import { useT } from '../lib/i18n';
 import {
   getTraceDetail,
   listTraces,
@@ -47,6 +48,7 @@ function fmtTime(iso: string): string {
 }
 
 export function Traces() {
+  const t = useT();
   const [params, setParams] = useSearchParams();
   const traceId = params.get('traceId');
 
@@ -60,6 +62,7 @@ export function Traces() {
 // ================= 列表页 =================
 
 function TraceList({ onSelect }: { onSelect: (id: string) => void }) {
+  const t = useT();
   // Round 11 §ui-b5:筛选 URL 持久化(刷新/分享保留状态)
   const [range, setRange] = useUrlState('range', '1h');
   const [operation, setOperation] = useUrlState('operation', '' as string);
@@ -126,32 +129,32 @@ function TraceList({ onSelect }: { onSelect: (id: string) => void }) {
         <Select options={RANGE_OPTIONS} value={range} onChange={setRange} style={{ width: 150 }} />
         <Select
           allowClear
-          placeholder="操作类型"
+          placeholder={t('traces.opType')}
           options={OPERATION_OPTIONS}
           value={operation}
           onChange={setOperation}
           style={{ width: 140 }}
         />
         <InputNumber
-          placeholder="最短耗时 ms"
+          placeholder={t('traces.minDur')}
           min={0}
           value={minDuration}
           onChange={(v) => setMinDuration(v ?? 0)}
           style={{ width: 120 }}
         />
         <Input
-          placeholder="租户 ID"
+          placeholder={t('traces.tenantId')}
           value={tenantId}
           onChange={(e) => setTenantId(e.target.value)}
           style={{ width: 120 }}
           prefix={<SearchOutlined />}
         />
-        <Tooltip title="只看有错误的链路">
+        <Tooltip title={t('traces.errorOnly')}>
           <span>
             错误 <Switch size="small" checked={errorOnly} onChange={(v) => setErrorOnly(v)} />
           </span>
         </Tooltip>
-        <Tooltip title="30 秒自动刷新">
+        <Tooltip title={t('traces.autoRefresh')}>
           <span>
             自动 <Switch size="small" checked={autoRefresh} onChange={(v) => setAutoRefresh(v)} />
           </span>
@@ -230,6 +233,7 @@ function e503(msg: string): boolean {
 // ================= 详情页(瀑布图) =================
 
 function TraceDetail({ traceId, onBack }: { traceId: string; onBack: () => void }) {
+  const t = useT();
   const [spans, setSpans] = useState<SpanRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -472,7 +476,7 @@ function TraceDetail({ traceId, onBack }: { traceId: string; onBack: () => void 
                   }}
                 >
                   <Form.Item name="model" label="model" initialValue="">
-                    <Input placeholder="gpt-4o / claude-3-opus …" />
+                    <Input placeholder="gpt-4o / claude-3-opus …" data-testid="traces-filter-model" />
                   </Form.Item>
                   <Form.Item name="temperature" label="temperature" initialValue={0.7}>
                     <InputNumber min={0} max={2} step={0.1} />
@@ -487,7 +491,7 @@ function TraceDetail({ traceId, onBack }: { traceId: string; onBack: () => void 
               children: (
                 <Space direction="vertical" style={{ width: '100%' }}>
                   <Input
-                    placeholder="对比目标 traceId"
+                    placeholder={t('traces.compareTraceId')}
                     value={diffAgainst}
                     onChange={(e) => setDiffAgainst(e.target.value)}
                   />
