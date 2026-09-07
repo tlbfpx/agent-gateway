@@ -2,6 +2,26 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [0.5.0] — 2026-09-07
+
+可监控 + 自查询：客服 / Ops 友好，集成方自服务。
+
+### ✨ New Features
+- **/v1/admin/me** — X-Admin-Token 查当前 AdminUser（id/email/name/role/tenantId/createdAt）
+  · 客服 / 集成方 / Ops 自查「现在拿的是谁 token 在用」
+  · AdminAuthService.findByToken(token) 新增 helper
+- **/v1/admin/stats 升级** — `activeApiKeys` 字段（当前活跃 key 数）
+- **/v1/admin/stats/prom** 加 `agent_gateway_active_api_keys` gauge
+- **i18n 补全 14 张页面**（业务页关键字符串 /chat /agents /audit）
+- **Lang toggle 接入 antd locale**（zhCN / enUS 自动切换）
+
+### 📦 Internal
+- 35+ 单测
+- TS 0 错
+- 路由巡检 41/41 全绿
+
+---
+
 ## [0.4.0] — 2026-09-07
 
 i18n 完整 + 可监控 + 可集成：海外买家 0 摩擦走完试用漏斗。
