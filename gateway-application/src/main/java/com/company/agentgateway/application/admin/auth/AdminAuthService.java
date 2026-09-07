@@ -81,6 +81,18 @@ public class AdminAuthService {
         return Optional.of(s.role);
     }
 
+    /** 通过 token 查 AdminUser（spec §whoami round 48）。无 / 过期 → null。 */
+    public AdminUser findByToken(String token) {
+        if (token == null || token.isBlank()) return null;
+        Session s = sessions.get(token);
+        if (s == null) return null;
+        if (s.expiresAt < System.currentTimeMillis()) {
+            sessions.remove(token);
+            return null;
+        }
+        return userRepo.findById(s.adminId).orElse(null);
+    }
+
     /** 显式 logout */
     public void logout(String token) {
         if (token != null) sessions.remove(token);
