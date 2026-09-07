@@ -33,6 +33,7 @@ import {
   CodeOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { BundleDownloader } from '../components/openapi/BundleDownloader';
 import { fetchOpenApi, groupByTag, flattenEndpoints } from '../lib/api/openapi';
 import type { ApiEndpoint } from '../lib/api/openapi';
@@ -56,11 +57,12 @@ const METHOD_COLOR: Record<string, string> = {
 };
 
 export function ApiExplorer() {
+  const t = useT();
   return (
     <>
       <PageHeader
         eyebrow="API · 接口"
-        title="API 浏览器"
+        title={t("api.title")}
         sub="OpenAPI 3.0 · /v1/openapi.json · 也支持 OpenAI 兼容模式"
       />
       <Tabs

@@ -300,6 +300,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'guardrails.globalMode': { zh: '全局模式', en: 'Global mode' },
   'cache.title':          { zh: 'Semantic Cache', en: 'Semantic Cache' },
   'configReloader.title': { zh: 'Config Reloader', en: 'Config Reloader' },
+
+  // ---- /api (ApiExplorer) ----
+  'api.title': { zh: 'API 浏览器', en: 'API browser' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
