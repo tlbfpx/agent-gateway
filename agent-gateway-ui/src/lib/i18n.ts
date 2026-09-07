@@ -267,6 +267,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   // ---- /models ----
   'models.eyebrow': { zh: '模型', en: 'Models' },
   'models.title':   { zh: '模型注册与路由', en: 'Model registry & routing' },
+
+  // ---- /k8s ----
+  'k8s.crdTitle': { zh: 'K8s CRD', en: 'K8s CRDs' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

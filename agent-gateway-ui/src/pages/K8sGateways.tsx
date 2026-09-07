@@ -7,6 +7,7 @@ import {
   PlusOutlined, ReloadOutlined, DeleteOutlined, ExperimentOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import { useUrlState } from '../hooks/useUrlState';
 import {
@@ -21,6 +22,7 @@ import {
  * Gateway + Route 管理,模拟 kubectl apply 体验。
  */
 export function K8sGateways() {
+  const t = useT();
   const [namespace, setNamespace] = useUrlState<string>('namespace', 'default');
   const [gateways, setGateways] = useState<K8sGateway[]>([]);
   const [routes, setRoutes] = useState<K8sRoute[]>([]);
@@ -148,7 +150,7 @@ export function K8sGateways() {
     <>
       <PageHeader
         eyebrow="平台化"
-        title="K8s CRD"
+        title={t('k8s.crdTitle')}
         sub="AgentGateway / AgentRoute CRD 管理(模拟 K8s API)"
         actions={
           <Space>
