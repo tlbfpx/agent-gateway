@@ -2,6 +2,23 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [0.9.0] — 2026-09-07
+
+业务页双语接近完整：22 张公开/首登/业务页全 zh/en 切换。
+
+### ✨ New Features
+- **/ratelimit 限流面板英文化**
+- **/models 模型注册与路由英文化**
+- **/k8s CRD 英文化**
+- **/v1/admin/api-keys 加 tenant / includeRevoked filter**（round 63）
+
+### 📦 Internal
+- 35+ 单测
+- TS 0 错
+- 源码版本号 = GH tag = 0.9.0
+
+---
+
 ## [0.8.0] — 2026-09-07
 
 k8s 三段探针 + admin 端点补全：完整 11 个端点。
