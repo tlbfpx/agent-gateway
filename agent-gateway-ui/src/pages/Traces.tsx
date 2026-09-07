@@ -179,7 +179,7 @@ function TraceList({ onSelect }: { onSelect: (id: string) => void }) {
             width: 180,
             render: (v: string) => <code style={{ fontSize: 12 }}>{v.slice(0, 16)}…</code>,
           },
-          { title: '入口', dataIndex: 'rootSpanName', width: 110, render: spanLabel },
+          { title: t('traces.entry'), dataIndex: 'rootSpanName', width: 110, render: spanLabel },
           {
             title: '总耗时',
             dataIndex: 'totalDurationMs',
@@ -303,7 +303,7 @@ function TraceDetail({ traceId, onBack }: { traceId: string; onBack: () => void 
         <Button
           size="small"
           onClick={() => {
-            void navigator.clipboard.writeText(traceId).then(() => message.success('已复制 traceId'));
+            void navigator.clipboard.writeText(traceId).then(() => message.success(t('traces.copied')));
           }}
         >
           复制 ID

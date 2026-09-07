@@ -231,6 +231,8 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'traces.errorOnly':    { zh: '只看有错误的链路', en: 'Error only' },
   'traces.autoRefresh':  { zh: '30 秒自动刷新', en: 'Auto refresh 30s' },
   'traces.compareTraceId':{ zh: '对比目标 traceId', en: 'Compare to traceId' },
+  'traces.entry':        { zh: '入口', en: 'Entry' },
+  'traces.copied':       { zh: '已复制 traceId', en: 'Copied traceId' },
 
   // ---- /workflows ----
   'workflows.title':    { zh: '多 Agent 链式工作流', en: 'Multi-agent workflow' },
