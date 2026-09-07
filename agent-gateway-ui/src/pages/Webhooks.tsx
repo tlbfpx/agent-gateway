@@ -26,6 +26,7 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import {
   listWebhooks,
   subscribeWebhook,
@@ -45,6 +46,7 @@ import { EmptyState, ErrorState } from '../components/framework/EmptyState';
 import { useAutoOpenCreate } from '../hooks/useAutoOpenCreate';
 
 export function Webhooks() {
+  const t = useT();
   const [subs, setSubs] = useState<WebhookSub[]>([]);
   const [dls, setDls] = useState<DeadLetter[]>([]);
   const [history, setHistory] = useState<WebhookHistoryRow[]>([]);
@@ -266,7 +268,7 @@ export function Webhooks() {
     <>
       <PageHeader
         eyebrow="Webhooks · 回调"
-        title="Webhook 订阅与死信"
+        title={t("webhooks.title")}
         sub={`共 ${subs.length} 个订阅 · ${dls.length} 条死信`}
         actions={
           <>

@@ -283,6 +283,12 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /plugins ----
   'plugins.title':   { zh: '插件系统', en: 'Plugin system' },
+
+  // ---- /webhooks ----
+  'webhooks.title':  { zh: 'Webhook 订阅与死信', en: 'Webhook subscriptions & DLQ' },
+
+  // ---- /reconcile ----
+  'reconcile.title': { zh: '用量对账', en: 'Usage reconciliation' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

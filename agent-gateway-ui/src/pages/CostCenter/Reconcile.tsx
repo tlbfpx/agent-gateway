@@ -30,6 +30,7 @@ import {
 } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
 import { PageHeader } from '../../components/framework/PageHeader';
+import { useT } from '../../lib/i18n';
 import { getVirtualKeyUsage } from '../../lib/api/keys';
 import type { UsageRecord } from '../../lib/api/keys';
 import { exportCsv } from '../../lib/export';
@@ -62,6 +63,7 @@ function isoDate(d: Date): string {
 }
 
 export function Reconcile() {
+  const t = useT();
   // 默认 from/to = 今天 00:00 ~ 23:59
   const [range, setRange] = useState<[Dayjs, Dayjs]>(() => [
     dayjs().startOf('day'),
@@ -178,7 +180,7 @@ export function Reconcile() {
     <>
       <PageHeader
         eyebrow="Cost · 对账"
-        title="用量对账"
+        title={t("reconcile.title")}
         sub={
           <Space size={8}>
             <Tag color="default">租户 primary</Tag>
