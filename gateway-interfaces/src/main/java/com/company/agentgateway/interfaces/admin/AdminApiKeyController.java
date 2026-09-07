@@ -40,8 +40,12 @@ public class AdminApiKeyController {
     /** 列表（key 脱敏显示：sk-****abcd）。 */
     @GetMapping
     public java.util.List<java.util.Map<String, Object>> list(
-            @RequestHeader("X-API-Key") String apiKey) {
+            @RequestHeader("X-API-Key") String apiKey,
+            @RequestParam(value = "tenant", required = false) String tenant,
+            @RequestParam(value = "includeRevoked", defaultValue = "false") boolean includeRevoked) {
         return apiKeyStore.entries().stream()
+                .filter(e -> tenant == null || e.getValue().tenant().value().equals(tenant))
+                .filter(e -> includeRevoked || !e.getValue().revoked())
                 .map(e -> {
                     ApiKeyStore.ApiKeyBinding b = e.getValue();
                     java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
