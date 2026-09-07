@@ -273,6 +273,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /config-history ----
   'configHistory.title': { zh: '配置版本与回滚', en: 'Config versions & rollback' },
+
+  // ---- /prompts ----
+  'prompts.title': { zh: 'Prompt 模板', en: 'Prompt templates' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

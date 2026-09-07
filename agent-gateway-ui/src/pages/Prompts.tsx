@@ -8,6 +8,7 @@ import {
   ExperimentOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import {
   listTemplates, getTemplate, createTemplate, deleteTemplate,
@@ -24,6 +25,7 @@ const SELECTED_KEY = 'prompts.selected';
  * 列表 + 详情(版本树) + 创建 Template + 添加 Version + 创建 A/B Experiment + 查看 summary
  */
 export function Prompts() {
+  const t = useT();
   const [tenant, setTenant] = useUrlState<string>('tenant', 'au');
   const [templates, setTemplates] = useState<PromptTemplate[]>([]);
   const [selected, setSelected] = useState<PromptTemplate | null>(null);
@@ -182,7 +184,7 @@ export function Prompts() {
     <>
       <PageHeader
         eyebrow="智能"
-        title="Prompt 模板"
+        title={t('prompts.title')}
         sub="版本管理 + A/B 实验"
         actions={
           <Space>
