@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { Row, Col, Tag, Empty, Button } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import { listDiscovery, listAgents } from '../lib/api/agents';
 import type { AgentInfo } from '../lib/api/agents';
 
 export function Discovery() {
+  const t = useT();
   const [agents, setAgents] = useState<AgentInfo[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +33,7 @@ export function Discovery() {
     <>
       <PageHeader
         eyebrow="Discovery · 服务发现"
-        title="Agent 注册"
+        title={t("discovery.title")}
         sub="通过 Nacos 同步的 AgentCard · 心跳状态实时显示"
         actions={<Button icon={<ReloadOutlined />} onClick={load}>刷新</Button>}
       />

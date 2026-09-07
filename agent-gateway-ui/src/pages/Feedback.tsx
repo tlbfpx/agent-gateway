@@ -17,6 +17,7 @@ import {
   DislikeOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import { FeedbackSummaryCard } from '../components/feedback/FeedbackSummaryCard';
 import { listFeedback, type FeedbackRecord, type Sentiment } from '../lib/api/feedback';
@@ -45,6 +46,7 @@ const SENTIMENT_LABEL: Record<Sentiment, string> = {
  * - 操作:导出 CSV
  */
 export function Feedback() {
+  const t = useT();
   const [tenant, setTenant] = useState(getTenant());
   const [model, setModel] = useState<string | undefined>();
   const [sentiment, setSentiment] = useState<Sentiment | undefined>();
@@ -163,7 +165,7 @@ export function Feedback() {
     <>
       <PageHeader
         eyebrow="运营"
-        title="Feedback 标注"
+        title={t("feedback.title")}
         sub="用户对模型回复的 👍/👎 反馈 · 运营回流真实标注"
         actions={
           <Space>

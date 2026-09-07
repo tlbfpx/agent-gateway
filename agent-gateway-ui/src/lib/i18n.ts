@@ -289,6 +289,12 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /reconcile ----
   'reconcile.title': { zh: '用量对账', en: 'Usage reconciliation' },
+
+  // ---- /feedback ----
+  'feedback.title': { zh: 'Feedback 标注', en: 'Feedback annotations' },
+
+  // ---- /discovery ----
+  'discovery.title': { zh: 'Agent 注册', en: 'Agent registry' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
