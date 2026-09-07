@@ -2,6 +2,18 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [1.1.0] — 2026-09-07
+
+**业务页 i18n 100% 覆盖：32 张全双语**。
+
+### ✨ New Features
+- 业务页双语最后 3 张（/guardrails / /cache / /config-reloader）
+- /feedback + /discovery 业务页双语
+- /webhooks + /reconcile 业务页双语
+- 累计 32 张公开/首登/业务页全 zh/en 切换
+
+---
+
 ## [1.0.0] — 2026-09-07
 
 **首个 GA（General Availability）版本。**
