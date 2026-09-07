@@ -20,6 +20,7 @@ import {
   ReloadOutlined, PlusOutlined, DeleteOutlined, WarningOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { ErrorState, EmptyState } from '../components/framework/EmptyState';
 import {
   createBudget, deleteBudget, findBudget, updateBudget,
@@ -28,6 +29,7 @@ import {
 import { listCosts } from '../lib/api/billing';
 
 export function Budgets() {
+  const t = useT();
   // 成本中心下钻联动：读取 URL 查询参数（tenant 或 key）自动过滤最近用量记账
   const [searchParams, setSearchParams] = useSearchParams();
   const drillFilter = searchParams.get('tenant') ?? searchParams.get('key') ?? '';
@@ -113,7 +115,7 @@ export function Budgets() {
 
   return (
     <>
-      <PageHeader eyebrow="成本中心" title="预算管理"
+      <PageHeader eyebrow={`成本中心`} title={t('budgets.title')}
         sub="租户级预算 + 告警阈值（spec §21.4）— SUSPEND 为显式管理员动作，自动策略只到 THROTTLE" />
 
       {error && <ErrorState error={error} onRetry={load} />}
@@ -144,7 +146,7 @@ export function Budgets() {
       )}
 
       <Card
-        title="当前预算"
+        title={t('budgets.current')}
         extra={
           <Space>
             <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>刷新</Button>
@@ -187,7 +189,7 @@ export function Budgets() {
         )}
       </Card>
 
-      <Card title={budget ? '更新预算（覆盖当前配置）' : '创建预算'} style={{ marginTop: 16 }}
+      <Card title={budget ? t('budgets.update') : t('budgets.create')} style={{ marginTop: 16 }}
         extra={budget ? <Tag>更新模式</Tag> : <Tag color="green"><PlusOutlined /> 新建</Tag>}>
         <Form form={form} layout="inline" onFinish={(v) => submit(v, budget ? 'update' : 'create')}
           initialValues={{ type: 'MONEY', alertThresholdPct: 80, suspendAction: 'ALERT' }}>
@@ -224,7 +226,7 @@ export function Budgets() {
         </div>
       </Card>
 
-      <Card title="最近用量记账（真实 token，单价快照）" style={{ marginTop: 16 }}>
+      <Card title={t('budgets.recentUsage')} style={{ marginTop: 16 }}>
         <Table<UsageRecord> rowKey="recordId" size="small" loading={loading}
           dataSource={filteredRecent} columns={columns} pagination={{ pageSize: 10 }} />
       </Card>

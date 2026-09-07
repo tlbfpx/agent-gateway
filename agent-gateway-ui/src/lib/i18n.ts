@@ -252,6 +252,14 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'cost.title':       { zh: '成本中心', en: 'Cost center' },
   'cost.trendTitle':  { zh: '成本走势', en: 'Cost trend' },
   'cost.shareTitle':  { zh: '成本占比', en: 'Cost share' },
+
+  // ---- /budgets ----
+  'budgets.eyebrow':         { zh: '预算管理', en: 'Budgets' },
+  'budgets.title':           { zh: '预算管理', en: 'Budget management' },
+  'budgets.currentBudget':  { zh: '当前预算', en: 'Current budget' },
+  'budgets.createBudget':   { zh: '创建预算', en: 'Create budget' },
+  'budgets.updateBudget':   { zh: '更新预算（覆盖当前配置）', en: 'Update budget (overrides existing)' },
+  'budgets.recentUsage':    { zh: '最近用量记账（真实 token，单价快照）', en: 'Recent usage (real tokens, snapshot pricing)' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
