@@ -295,6 +295,11 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /discovery ----
   'discovery.title': { zh: 'Agent 注册', en: 'Agent registry' },
+
+  // ---- /guardrails /cache /config-reloader ----
+  'guardrails.globalMode': { zh: '全局模式', en: 'Global mode' },
+  'cache.title':          { zh: 'Semantic Cache', en: 'Semantic Cache' },
+  'configReloader.title': { zh: 'Config Reloader', en: 'Config Reloader' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

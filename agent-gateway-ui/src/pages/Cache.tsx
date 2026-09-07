@@ -2,12 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Card, Statistic, Table, Button, Tag, Space, Popconfirm, message } from 'antd';
 import { ReloadOutlined, ThunderboltOutlined, FireOutlined } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { cacheStats, cacheTopQueries, cacheInvalidate, cachePurge } from '../lib/api/cache';
 import type { CacheStats, TopQuery } from '../lib/api/cache';
 
 const fmtCents = (c: number) => `¥${(c / 100).toFixed(2)}`;
 
 export function Cache() {
+  const t = useT();
   const [stats, setStats] = useState<CacheStats | null>(null);
   const [tops, setTops] = useState<TopQuery[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +57,7 @@ export function Cache() {
     <div style={{ padding: 24 }}>
       <PageHeader
         eyebrow="Sprint 4 P0"
-        title="Semantic Cache"
+        title={t("cache.title")}
         sub="语义缓存命中率与成本节省 — text-embedding-3-small + pgvector HNSW"
         actions={
           <Space>

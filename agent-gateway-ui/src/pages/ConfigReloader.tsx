@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Card, Tag, Button, Space, Spin, message } from 'antd';
 import { ReloadOutlined, CheckCircleTwoTone, ExclamationCircleTwoTone, SyncOutlined } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { configStatusAll, configStatusRecent } from '../lib/api/configStatus';
 
 type State = 'SYNCED' | 'RELOADING' | 'FAILED' | 'UNKNOWN';
@@ -30,6 +31,7 @@ const stateTag = (s: State) => {
 const fmt = (ms: number) => (ms > 0 ? new Date(ms).toLocaleString() : '—');
 
 export function ConfigReloader() {
+  const t = useT();
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -57,7 +59,7 @@ export function ConfigReloader() {
     <div style={{ padding: 24 }}>
       <PageHeader
         eyebrow="Sprint 1 P0"
-        title="Config Reloader"
+        title={t("configReloader.title")}
         sub="热重载状态总览 — 文件变更 / Nacos push / K8s ConfigMap 同步更新，无需重启"
         actions={
           <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>

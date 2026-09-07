@@ -1,6 +1,7 @@
 import { Button, Card, Form, Input, Select, Space, Tag, Typography, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { guardrailsApi, type GuardrailMode, type GuardrailPolicy } from '../lib/api/guardrails';
+import { useT } from '../lib/i18n';
 
 const { Title, Paragraph } = Typography;
 
@@ -11,6 +12,7 @@ const MODE_OPTIONS: { label: string; value: GuardrailMode }[] = [
 ];
 
 export function Guardrails() {
+  const t = useT();
   const [policy, setPolicy] = useState<GuardrailPolicy | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +46,7 @@ export function Guardrails() {
         模式切换:BLOCK=拒绝 / OBSERVE=仅记录 / REDACT=脱敏后继续。
       </Paragraph>
 
-      <Card title="全局模式" style={{ marginBottom: 16 }}>
+      <Card title={t("guardrails.globalMode")} style={{ marginBottom: 16 }}>
         <Form layout="vertical">
           <Form.Item label="模式">
             <Select<GuardrailMode>
