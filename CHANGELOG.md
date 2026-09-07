@@ -2,6 +2,23 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [1.0.0] — 2026-09-07
+
+**首个 GA（General Availability）版本。**
+
+累计 9 个 prerelease + 68 轮 cron：v1.0.0 = 第一个标 v1 的稳定 release。
+
+### ✨ Features（自 v0.9.0）
+- （v0.9.0 = 上一版；v1.0.0 无新 feature，仅 GA 标号 + 文档化）
+
+### 📦 Internal
+- 35+ 单测
+- TS 0 错
+- 22 张双语页 + 12 个端点 + k8s 三段探针
+- 源码版本号 = GH tag = 1.0.0
+
+---
+
 ## [0.9.0] — 2026-09-07
 
 业务页双语接近完整：22 张公开/首登/业务页全 zh/en 切换。
