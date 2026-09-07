@@ -33,6 +33,7 @@ import {
   BellOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import {
   alertsApi,
   OPERATOR_LABEL,
@@ -61,6 +62,7 @@ function fmtTime(iso: string): string {
 }
 
 export function AlertCenter() {
+  const t = useT();
   // 成本中心/预算页下钻联动：读取 ?q= 关键字自动过滤告警流
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get('q') ?? '';
@@ -270,6 +272,7 @@ export function AlertCenter() {
                   {shown.map((a) => (
                     <AlertRecordRow
                       key={a.id}
+                      t={t}
                       record={a}
                       onAck={() => onAck(a.id)}
                       onSilence={() => onSilence(a.id)}
@@ -347,10 +350,12 @@ export function AlertCenter() {
 }
 
 function AlertRecordRow({
+  t,
   record: r,
   onAck,
   onSilence,
 }: {
+  t: (key: string) => string;
   record: AlertRecord;
   onAck: () => void;
   onSilence: () => void;
