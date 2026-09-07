@@ -2,6 +2,24 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [1.1.2] — 2026-09-07
+
+运维端点补全：/v1/admin/system-info 给 SRE 一键查 JVM 内存 / 线程 / OS 负载。
+
+### ✨ New Features
+- **`/v1/admin/system-info`** 端点
+  - jvm（version / vendor / vmName / vmVersion）
+  - memory（max / total / free / used + human-readable）
+  - threads（count / peak / daemon）
+  - os（name / arch / version / processors / loadAverage）
+  - uptimeSeconds
+
+### 📦 Internal
+- 35+ 单测 · TS 0 错
+- 累计 14 端点 + 33 张全双语 + 12 release
+
+---
+
 ## [1.1.1] — 2026-09-07
 
 公开 demo 部署 + Demo 重置端点。
