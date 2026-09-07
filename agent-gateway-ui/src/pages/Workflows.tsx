@@ -25,6 +25,7 @@ import {
   message,
 } from 'antd';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import { Tag, Tooltip, Drawer, Descriptions } from 'antd';
 import {
@@ -89,11 +90,12 @@ function fmtDuration(ms: number | null): string {
 }
 
 export function Workflows() {
+  const t = useT();
   return (
     <>
       <PageHeader
         eyebrow="Workflows · 编排"
-        title="多 Agent 链式工作流"
+        title={t('workflows.title')}
         sub="显式编排(不走 LLM 自决):Step 链 + JSONPath 引用上一步 outputs"
       />
       <Tabs

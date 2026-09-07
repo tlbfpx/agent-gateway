@@ -231,6 +231,22 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'traces.errorOnly':    { zh: '只看有错误的链路', en: 'Error only' },
   'traces.autoRefresh':  { zh: '30 秒自动刷新', en: 'Auto refresh 30s' },
   'traces.compareTraceId':{ zh: '对比目标 traceId', en: 'Compare to traceId' },
+
+  // ---- /workflows ----
+  'workflows.title':    { zh: '多 Agent 链式工作流', en: 'Multi-agent workflow' },
+  'workflows.filter':   { zh: '筛选', en: 'Filter' },
+  'workflows.history':  { zh: '运行历史(逆序)', en: 'Run history (newest first)' },
+  'workflows.quickRun': { zh: '快速运行(粘 JSON)', en: 'Quick run (paste JSON)' },
+  'workflows.detail':   { zh: '运行详情', en: 'Run detail' },
+  'workflows.defs':     { zh: '定义列表', en: 'Definitions' },
+
+  // ---- /alert-center ----
+  'alerts.eyebrow':     { zh: 'Alerts · 告警', en: 'Alerts' },
+  'alerts.title':       { zh: '告警中心', en: 'Alert center' },
+  'alerts.newRule':     { zh: '新建告警规则', en: 'New rule' },
+  'alerts.editRule':    { zh: '编辑规则 · ', en: 'Edit rule · ' },
+  'alerts.threshold':   { zh: '观测值 / 阈值', en: 'Metric / threshold' },
+  'alerts.deleteRule':  { zh: '删除规则？', en: 'Delete this rule?' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
