@@ -2,6 +2,25 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [0.8.0] — 2026-09-07
+
+k8s 三段探针 + admin 端点补全：完整 11 个端点。
+
+### ✨ New Features
+- **/v1/ping** startupProbe（无鉴权 / 永远 200）
+  · k8s 三段探针完整（ping / health / ready）
+- **/v1/admin/sessions** 活跃 session 计数
+- **/v1/admin/tenants** 租户列表
+- **/v1/admin/users** Admin 列表
+- **/cost 页面英文化**（业务页 18 张全双语）
+
+### 📦 Internal
+- 35+ 单测
+- TS 0 错
+- 源码版本号 = GH tag = 0.8.0
+
+---
+
 ## [0.7.0] — 2026-09-07
 
 admin / ops 端点补全：10 个端点覆盖完整运维面板。
