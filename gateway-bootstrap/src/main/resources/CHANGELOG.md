@@ -2,6 +2,23 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [0.7.0] — 2026-09-07
+
+admin / ops 端点补全：10 个端点覆盖完整运维面板。
+
+### ✨ New Features
+- **/v1/admin/sessions**（X-Admin-Token）当前活跃 admin session 计数
+- **/v1/admin/tenants** 租户列表（按 activeApiKeys 倒序）
+- **/v1/admin/users** Admin 列表（按 tenant / role / status 过滤）
+- 附带修复 AdminAuthService 编译错误
+
+### 📦 Internal
+- 35+ 单测
+- TS 0 错
+- 源码版本号 = GH tag = 0.7.0（pom.xml + package.json 对齐）
+
+---
+
 ## [0.6.0] — 2026-09-07
 
 i18n 完整闭环：17 张公开 / 首登 / 业务页全双语。
