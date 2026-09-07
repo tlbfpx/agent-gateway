@@ -2,6 +2,17 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [1.4.0] — 2026-09-07
+
+### ✨ Internal
+- 累计 16 release
+- 35+ 单测 · TS 0 错
+- 33 张全双语 + 14 端点
+
+（v1.4.0 = v1.3.1 内部 polish + 累计标记；无新 feature，仅版本号 bump）
+
+---
+
 ## [1.3.1] — 2026-09-07
 
 业务页 i18n 最后一公里：剩余 message / tooltip 走 t()。
