@@ -2,6 +2,20 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [1.3.1] — 2026-09-07
+
+业务页 i18n 最后一公里：剩余 message / tooltip 走 t()。
+
+### ✨ New Features
+- /feedback 导出消息 i18n
+- /alert-center 消息/标题 i18n
+
+### 📦 Internal
+- 35+ 单测 · TS 0 错
+- 累计 15 release
+
+---
+
 ## [1.1.2] — 2026-09-07
 
 运维端点补全：/v1/admin/system-info 给 SRE 一键查 JVM 内存 / 线程 / OS 负载。
