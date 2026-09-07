@@ -247,6 +247,11 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'alerts.editRule':    { zh: '编辑规则 · ', en: 'Edit rule · ' },
   'alerts.threshold':   { zh: '观测值 / 阈值', en: 'Metric / threshold' },
   'alerts.deleteRule':  { zh: '删除规则？', en: 'Delete this rule?' },
+
+  // ---- /cost (CostCenter) ----
+  'cost.title':       { zh: '成本中心', en: 'Cost center' },
+  'cost.trendTitle':  { zh: '成本走势', en: 'Cost trend' },
+  'cost.shareTitle':  { zh: '成本占比', en: 'Cost share' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

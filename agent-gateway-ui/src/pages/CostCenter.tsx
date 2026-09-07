@@ -35,6 +35,7 @@ import {
   BellOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { StatCard, MicronIcon } from '../components/framework/StatCard';
 import {
   loadCostReport,
@@ -65,6 +66,7 @@ function parseDimParam(v: string | null): Dim {
 }
 
 export function CostCenter() {
+  const t = useT();
   // Round4 评审项：range / dim 与 URL 双向绑定，便于分享/收藏/刷新恢复。
   // 与 Budgets.tsx、AlertCenter.tsx 同款模式；persist=true 时写入本地偏好。
   const [searchParams, setSearchParams] = useSearchParams();
@@ -165,7 +167,7 @@ export function CostCenter() {
     <>
       <PageHeader
         eyebrow="Cost · 成本"
-        title="成本中心"
+        title={t('cost.title')}
         sub={
           report ? (
             <span>
@@ -268,7 +270,7 @@ export function CostCenter() {
                 data={timeseries}
                 range={range}
                 metric="cost"
-                title="成本走势"
+                title={t('cost.trendTitle')}
                 unit="元"
               />
             </Col>
@@ -276,7 +278,7 @@ export function CostCenter() {
               <ModelSharePie
                 slices={breakdown.map((b) => ({ label: b.label, value: b.costCny }))}
                 total={breakdown.reduce((acc, b) => acc + b.costCny, 0)}
-                title="成本占比"
+                title={t('cost.shareTitle')}
               />
             </Col>
           </Row>
