@@ -29,6 +29,9 @@ export interface DemoSession {
 export const demoApi = {
   status: () => http.get<DemoStatus>('/demo/status'),
   bootstrap: () => http.post<DemoSession>('/demo/bootstrap'),
+  reset: (apiKey: string) => http.post<{ removed: number; message: string }>(
+    '/demo/reset', null, { headers: { 'X-API-Key': apiKey } }
+  ),
 };
 
 /** localStorage key 集合（与 lib/request.ts 的 KEY_* 对齐） */

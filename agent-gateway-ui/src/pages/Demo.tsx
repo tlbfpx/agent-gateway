@@ -39,6 +39,22 @@ export function Demo() {
     };
   }, []);
 
+  // 用户已有 demo key 时，提供「重置 demo」按钮（清旧 demo 重开）
+  const hasDemo = typeof window !== 'undefined'
+    && (window.localStorage?.getItem('agent-gateway.apiKey') ?? '').startsWith('sk-demo-');
+  const onResetDemo = async () => {
+    try {
+      const oldKey = window.localStorage.getItem('agent-gateway.apiKey') ?? '';
+      const r = await demoApi.reset(oldKey);
+      message.success(`已清理 ${r.removed} 个 key · 跳回 /demo 重开`);
+      ['agent-gateway.apiKey', 'agent-gateway.tenant', 'agent-gateway.adminToken',
+        'agent-gateway.demoExpiresAt'].forEach((k) => window.localStorage.removeItem(k));
+      setTimeout(() => { window.location.href = '/demo'; }, 500);
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : '重置失败');
+    }
+  };
+
   const onTryDemo = async () => {
     setBootstrapping(true);
     try {
@@ -103,6 +119,16 @@ export function Demo() {
             >
               {bootstrapping ? '创建中…' : '一键试用 Demo'}
             </Button>
+            {hasDemo && (
+              <Button
+                danger
+                size="large"
+                onClick={onResetDemo}
+                data-testid="demo-reset-btn"
+              >
+                重置当前 demo
+              </Button>
+            )}
           </Space>
         </Card>
       ) : (
