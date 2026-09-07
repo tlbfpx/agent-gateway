@@ -5,6 +5,7 @@ import com.company.agentgateway.interfaces.demo.DemoSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -47,6 +48,25 @@ public class DemoController {
     public DemoSession bootstrap() {
         ensureEnabled();
         return demoService.bootstrap();
+    }
+
+    /**
+     * 重置当前 demo（spec §demo-reset round 78）：
+     * - 删除本 demo 租户所有 key
+     * - 客户端应清 localStorage 后跳 /demo 重新触发 bootstrap
+     */
+    @PostMapping("/reset")
+    public java.util.Map<String, Object> reset(
+            @RequestHeader(value = "X-API-Key", required = false) String apiKey) {
+        ensureEnabled();
+        int removed = 0;
+        if (apiKey != null && !apiKey.isBlank()) {
+            removed = demoService.revokeByKey(apiKey);
+        }
+        java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
+        out.put("removed", removed);
+        out.put("message", "Demo data cleared. Reload /demo to start fresh.");
+        return out;
     }
 
     private void ensureEnabled() {

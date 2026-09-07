@@ -126,6 +126,24 @@ public class DemoService {
     }
 
     /**
+     * 主动重置：按 key 反查租户 + 吊销该租户所有 key。
+     * 用于「重置我的 demo」按钮 — 客户端拿当前 localStorage.apiKey 调用。
+     */
+    public int revokeByKey(String key) {
+        var b = apiKeyStore.findByKey(key).orElse(null);
+        if (b == null) return 0;
+        String tenantId = b.tenant().value();
+        int n = 0;
+        for (var entry : apiKeyStore.entries()) {
+            if (tenantId.equals(entry.getValue().tenant().value())) {
+                apiKeyStore.revoke(entry.getKey());
+                n++;
+            }
+        }
+        return n;
+    }
+
+    /**
      * 清理过期 demo apiKey。
      * 调用 {@link ApiKeyStore#revoke}（从 in-memory + 持久化文件移除）；
      * AdminAuthService 内的 session 由其自身的 TTL 兜底，无需此处处理。
