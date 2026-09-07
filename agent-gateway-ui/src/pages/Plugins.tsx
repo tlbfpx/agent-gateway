@@ -8,6 +8,7 @@ import {
   ApiOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import {
   listPlugins, disablePlugin, reloadPlugins, testSandbox,
@@ -27,6 +28,7 @@ const CAPABILITY_COLORS: Record<string, string> = {
  * /plugins 插件管理 + 沙箱测试页（Round 15 §wasm-plugins §9 UI）。
  */
 export function Plugins() {
+  const t = useT();
   const [plugins, setPlugins] = useState<PluginDescriptor[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -125,7 +127,7 @@ export function Plugins() {
     <>
       <PageHeader
         eyebrow="扩展"
-        title="插件系统"
+        title={t("plugins.title")}
         sub="Java SPI + 4 官方样本插件(R15+2 swap Chicory Wasm)"
         actions={
           <Space>

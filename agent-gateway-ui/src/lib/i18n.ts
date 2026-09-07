@@ -276,6 +276,13 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /prompts ----
   'prompts.title': { zh: 'Prompt 模板', en: 'Prompt templates' },
+
+  // ---- /datasets ----
+  'datasets.title':  { zh: '数据集 / 评测', en: 'Datasets & evaluation' },
+  'datasets.create': { zh: '新建数据集', en: 'New dataset' },
+
+  // ---- /plugins ----
+  'plugins.title':   { zh: '插件系统', en: 'Plugin system' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */

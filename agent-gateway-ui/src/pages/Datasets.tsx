@@ -8,6 +8,7 @@ import {
   CloudUploadOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../components/framework/PageHeader';
+import { useT } from '../lib/i18n';
 import { EmptyState } from '../components/framework/EmptyState';
 import { useUrlState } from '../hooks/useUrlState';
 import {
@@ -24,6 +25,7 @@ const SAMPLE_JSONL = `{"input":"hello","expected":"Hello! How can I help?"}
  * /datasets 数据集 + 评测管理页（Round 13 §dataset-eval §7 UI）。
  */
 export function Datasets() {
+  const t = useT();
   const [tenant, setTenant] = useUrlState<string>('tenant', 'au');
   const [datasets, setDatasets] = useState<EvalDataset[]>([]);
   const [selected, setSelected] = useState<EvalDataset | null>(null);
@@ -171,7 +173,7 @@ export function Datasets() {
     <>
       <PageHeader
         eyebrow="数据闭环"
-        title="数据集 / 评测"
+        title={t("datasets.title")}
         sub="JSONL 导入 + 规则评测 + 通过率报告"
         actions={
           <Space>
@@ -243,7 +245,7 @@ export function Datasets() {
       )}
 
       <Modal
-        title="新建数据集"
+        title={t("datasets.create")}
         open={createOpen}
         onCancel={() => setCreateOpen(false)}
         onOk={onCreate}
