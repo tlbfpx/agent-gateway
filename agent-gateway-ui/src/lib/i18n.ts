@@ -270,6 +270,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /k8s ----
   'k8s.crdTitle': { zh: 'K8s CRD', en: 'K8s CRDs' },
+
+  // ---- /config-history ----
+  'configHistory.title': { zh: '配置版本与回滚', en: 'Config versions & rollback' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
