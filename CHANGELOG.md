@@ -2,6 +2,23 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [1.1.1] — 2026-09-07
+
+公开 demo 部署 + Demo 重置端点。
+
+### ✨ New Features
+- **`deploy/docker-compose.demo.yml`** 一键公开 demo（postgres + gateway）
+- **`/v1/demo/reset`** 端点 — 吊销该租户所有 key（spec §demo-reset）
+- **`/demo` 「重置当前 demo」按钮** — 配合 /v1/demo/reset 一键重开
+- **`/api` 页面英文化**（累计 33 张全双语）
+- **`/feedback + /discovery` 英文化**
+
+### 📦 Internal
+- 35+ 单测 · TS 0 错
+- 累计 13 端点 + 33 张全双语 + 12 release
+
+---
+
 ## [1.1.0] — 2026-09-07
 
 **业务页 i18n 100% 覆盖：32 张全双语**。
