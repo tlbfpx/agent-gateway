@@ -2,6 +2,23 @@
 
 agent-gateway 的版本变更记录。Frontend `/changelog` 页面会读取本文件渲染卡片。
 
+## [0.6.0] — 2026-09-07
+
+i18n 完整闭环：17 张公开 / 首登 / 业务页全双语。
+
+### ✨ New Features
+- **业务页双语补全**（round 50-52）
+  · /traces 关键字符串
+  · /workflows 5 张 Card title
+  · /alert-center 6 个 Tooltip / 标题（含 t 作用域修复）
+- 累计 17 张页 zh/en 切换：8 公开 + 5 首登 / 配置 + 4 业务
+
+### 📦 Internal
+- 修复 AlertCenter useT() 子组件作用域 bug
+- TS 0 错；35+ 单测
+
+---
+
 ## [0.5.0] — 2026-09-07
 
 可监控 + 自查询：客服 / Ops 友好，集成方自服务。
