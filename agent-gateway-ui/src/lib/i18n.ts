@@ -303,6 +303,7 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // ---- /api (ApiExplorer) ----
   'api.title': { zh: 'API 浏览器', en: 'API browser' },
+  'feedback.exported': { zh: '已导出 {n} 条反馈', en: 'Exported {n} feedback records' },
 };
 
 /** 静态翻译查找（hook 外可用）。 */
