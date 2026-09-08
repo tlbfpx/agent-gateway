@@ -112,6 +112,7 @@ export function Workflows() {
 // ==================== 运行历史 Tab ====================
 
 function RunsTab() {
+  const t = useT();
   const [name, setName] = useState<string | undefined>();
   const [status, setStatus] = useState<WorkflowStatus | undefined>();
   const [range, setRange] = useState('24h');
@@ -263,6 +264,7 @@ function RunsTab() {
 }
 
 function RunDetail({ run }: { run: WorkflowRun }) {
+  const t = useT();
   // 选中 step(时间轴点击 → Drawer 详情)
   const [selectedStep, setSelectedStep] = useState<StepRun | null>(null);
   // C2 parallel + C4 嵌套可视化:parentIndex >= 0 表示子节点(parallel 分支 / switch case 子步骤),
